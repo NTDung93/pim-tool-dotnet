@@ -1,0 +1,120 @@
+<div class="new-project-container">
+  <p class="area-title">{{actionTitle | translate}}</p>
+  <div class="alert alert-danger alert-popup" role="alert" style="margin-top: 0.5rem"
+    *ngIf="(detailForm.submitted && detailForm.invalid) || isFailed" #alertPopup>
+    <span>{{ globalErr | translate }}</span>
+    <button type="button" class="close" aria-label="Close" (click)="closeAlert()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="form-container">
+    <form #detailForm="ngForm" (ngSubmit)="editMode ? onUpdateProject(detailForm) : onAddProject(detailForm)">
+
+      <div class="form-group">
+        <label for="number">{{ 'projectDetail.projectNumber' | translate }} <span style="color: red">*</span></label>
+        <div class="input-container">
+          <div class="input-container">
+            <input type="text" ngModel [readonly]="editMode" [ngModel]="editMode ? updateProject.number: null"
+              *ngIf="!editMode || editMode" name="number" class="form-control short-input" id="nanumberme"
+              [ngClass]="{ 'red-border': numberErr !== '' }" required />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group" *ngIf="numberErr != ''" style="margin: 0 !important; transform: translateY(-2rem)">
+        <label for="number"></label>
+        <div class="input-container">
+          <div class="form-text" style="color: red">
+            {{ numberErr | translate }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="name">{{ 'projectDetail.projectName' | translate }} <span style="color: red">*</span></label>
+        <div class="input-container">
+          <input type="text" [ngModel]="editMode ? updateProject.name : null" *ngIf="!editMode || editMode" name="name"
+            class="form-control" id="name" required />
+        </div>
+      </div>
+
+
+      <div class="form-group">
+        <label for="customer">{{ 'projectDetail.customer' | translate }} <span style="color: red">*</span></label>
+        <div class="input-container">
+          <input type="text" [ngModel]="editMode ? updateProject.customer : null" *ngIf="!editMode || editMode"
+            name="customer" class="form-control" id="customer" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="group">{{ 'projectDetail.group' | translate }} <span style="color: red">*</span></label>
+        <div class="input-container">
+          <select id="groupId" name="groupId" [ngModel]="editMode ? updateProject.groupId : null"
+            *ngIf="!editMode || editMode" class="short-input">
+            <option *ngFor="let group of groups" value="{{ group?.id }}">
+              Group {{ group?.id }} ({{ group?.groupLeader?.visa }})
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="member">{{ 'projectDetail.members' | translate }} </label>
+        <div class="input-container">
+          <input type="text" [ngModel]="editMode ? updateProject.members : null" *ngIf="!editMode || editMode"
+            name="member" class="form-control" id="member" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="status">{{ 'projectDetail.status' | translate }} <span style="color: red">*</span></label>
+        <div class="input-container">
+          <select id="status" name="status" [ngModel]="editMode ? updateProject.status : null"
+            *ngIf="!editMode || editMode" class="short-input">
+            <option value="" disabled>NEW</option>
+            <option value="NEW">New</option>
+            <option value="PLA">Planned</option>
+            <option value="INP">In Progress</option>
+            <option value="FIN">Finished</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-date">
+        <div class="form-group form-date__start">
+          <label for="startDate">{{ 'projectDetail.startDate' | translate }} <span style="color: red">*</span></label>
+          <div class="input-container">
+            <input type="date" [ngModel]="editMode ? updateProject.startDate : null" *ngIf="!editMode || editMode"
+              name="startDate" class="form-control short-input" id="startDate"
+              [ngClass]="{ 'red-border': ennDateErr !== '' }" required />
+          </div>
+        </div>
+
+        <div class="form-group form-date__end">
+          <label for="endDate">{{ 'projectDetail.endDate' | translate }} </label>
+          <div class="input-container">
+            <input type="date" [ngModel]="editMode ? updateProject.endDate : null" *ngIf="!editMode || editMode"
+              name="endDate" class="form-control short-input" id="endDate"
+              [ngClass]="{ 'red-border': ennDateErr !== '' }" />
+          </div>
+        </div>
+      </div>
+
+      <div style="margin: 0 !important; display: flex; justify-content: flex-end" *ngIf="ennDateErr != ''">
+        <div class="form-text" style="color: red; transform: translateY(-2rem)">
+          {{ ennDateErr | translate}}
+        </div>
+      </div>
+
+      <div class="form-footer">
+        <div class="modal-footer cancel-btn">
+          <button type="button" (click)="navigateToList()" class="btn">
+            {{ 'projectDetail.btnCancel' | translate }}
+          </button>
+        </div>
+        <div class="modal-footer create-btn">
+          <button type="submit" class="btn btn-primary">{{btnSubmitContent | translate}}</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

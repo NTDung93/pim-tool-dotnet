@@ -1,0 +1,147 @@
+<div class="list-project-container">
+  <p class="area-title">{{ "projectList.projectList" | translate}}</p>
+  <form #searchForm="ngForm" (ngSubmit)="searchProjects(searchForm)">
+    <div class="search-area">
+      <input type="text" ngModel [placeholder]="
+          savedSearchText
+            ? savedSearchText
+            : 'projectList.search.name' | translate
+        " name="searchText" />
+      <select ngModel name="status" class="short-input">
+        <option value="" selected disabled>
+          {{ savedStatus ? savedStatus : 'projectList.search.status' | translate }}
+        </option>
+        <option value="NEW">NEW</option>
+        <option value="PLA">PLA</option>
+        <option value="INP">INP</option>
+        <option value="FIN">FIN</option>
+      </select>
+      <div class="modal-footer search-btn">
+        <button type="submit" class="btn btn-primary">{{'projectList.search.btnSearch' | translate}}</button>
+      </div>
+      <div class="modal-footer reset-btn">
+        <button type="button" (click)="resetSearchHandle(searchForm)" class="btn">
+          {{'projectList.search.resetSearch' | translate}}
+        </button>
+      </div>
+    </div>
+  </form>
+  <table style="margin-bottom: 1rem">
+    <thead>
+      <tr>
+        <th></th>
+        <th>{{ 'projectList.tableHeading.number' | translate }}</th>
+        <th>{{ 'projectList.tableHeading.name' | translate }}</th>
+        <th>{{ 'projectList.tableHeading.status' | translate }}</th>
+        <th>{{ 'projectList.tableHeading.customer' | translate }}</th>
+        <th>{{ 'projectList.tableHeading.start' | translate }}</th>
+        <th>{{ 'projectList.tableHeading.delete' | translate }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let project of projects">
+        <td>
+          <input type="checkbox" [disabled]="project.status !== Status.NEW" (change)="toggleSelection(project)"
+            [checked]="isSelected(project)" />
+        </td>
+        <td style="text-decoration: underline; cursor: pointer"
+          (click)="navigateToProjectDetail(project); changeIsUpdate(true)">
+          {{ project.number }}
+        </td>
+        <td>{{ project.name }}</td>
+        <td>{{ project.status }}</td>
+        <td>{{ project.customer }}</td>
+        <td>{{ project.startDate }}</td>
+        <td>
+          <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#exampleModal"
+            style="background-color: transparent" (click)="setProjectIdDelete(project.id)"
+            *ngIf="project.status === Status.NEW">
+            <i style="color: red; cursor: pointer" class="fa-regular fa-trash-can"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="selectedItems.length > 0" class="selected-items">
+    <p style="margin: auto 0">{{ selectedItems.length }} items selected</p>
+
+    <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#exampleModal2"
+      style="background-color: transparent">
+      <p style="color: red; cursor: pointer">
+        delete selected items
+        <span>
+          <i style="color: red; cursor: pointer; margin-left: 5px" class="fa-regular fa-trash-can"></i></span>
+      </p>
+    </button>
+  </div>
+
+  <nav aria-label="Page navigation example" style="display: flex; justify-content: flex-end">
+    <ul class="pagination">
+      <li class="page-item">
+        <a class="page-link" href="" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item"><a class="page-link" href="">1</a></li>
+      <li class="page-item"><a class="page-link" href="">2</a></li>
+      <li class="page-item"><a class="page-link" href="">3</a></li>
+      <li class="page-item"><a class="page-link" href="">4</a></li>
+      <li class="page-item">
+        <a class="page-link" href="" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="display: flex; align-items: center">
+        <h3 class="modal-title fs-5" id="exampleModalLabel">{{ 'projectList.delete.warning' | translate }}!</h3>
+        <button type="button" data-bs-dismiss="modal" aria-label="Close"
+          style="background-color: transparent; border: none">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        {{ 'projectList.delete.question' | translate }}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          {{ 'projectList.delete.btnClose' | translate }}
+        </button>
+        <button type="button" (click)="deleteProject(deleteProjectId)" class="btn btn-danger" data-bs-dismiss="modal">
+          {{ 'projectList.delete.btnDelete' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="display: flex; align-items: center">
+        <h3 class="modal-title fs-5" id="exampleModalLabel">{{ 'projectList.delete.warning' | translate }}!</h3>
+        <button type="button" data-bs-dismiss="modal" aria-label="Close"
+          style="background-color: transparent; border: none">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        {{ 'projectList.delete.question' | translate }}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary " data-bs-dismiss="modal">
+          {{ 'projectList.delete.question' | translate }}
+        </button>
+        <button type="button" (click)="deleteSelectedProject()" class="btn btn-danger" data-bs-dismiss="modal">
+          {{ 'projectList.delete.question' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
