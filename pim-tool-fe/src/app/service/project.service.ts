@@ -21,10 +21,10 @@ export class ProjectService {
 
   public searchProjects(
     searchText: String,
-    status: String
+    status: number
   ): Observable<Project[]> {
     return this.http.get<Project[]>(
-      `${this.projectUrl}/project/search?searchText=${searchText}&status=${status}`
+      `${this.projectUrl}/Project/search?searchText=${searchText}&status=${status}`
     );
   }
 

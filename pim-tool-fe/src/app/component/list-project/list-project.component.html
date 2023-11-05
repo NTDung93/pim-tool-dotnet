@@ -1,20 +1,21 @@
+<lib-toastify-toast-container [autoClose]="2000"></lib-toastify-toast-container>
 <div class="list-project-container">
   <p class="area-title">{{ "projectList.projectList" | translate}}</p>
   <form #searchForm="ngForm" (ngSubmit)="searchProjects(searchForm)">
     <div class="search-area">
       <input type="text" ngModel [placeholder]="
-          savedSearchText
+          savedSearchText != undefined && savedSearchText != null && savedSearchText != ''
             ? savedSearchText
             : 'projectList.search.name' | translate
         " name="searchText" />
       <select ngModel name="status" class="short-input">
         <option value="" selected disabled>
-          {{ savedStatus ? savedStatus : 'projectList.search.status' | translate }}
+          {{ savedStatus != undefined && savedStatus != null && savedStatus != '' ? savedStatus : 'projectList.search.status' | translate }}
         </option>
-        <option value="NEW">NEW</option>
-        <option value="PLA">PLA</option>
-        <option value="INP">INP</option>
-        <option value="FIN">FIN</option>
+        <option value=0>NEW</option>
+        <option value=1>PLA</option>
+        <option value=2>INP</option>
+        <option value=3>FIN</option>
       </select>
       <div class="modal-footer search-btn">
         <button type="submit" class="btn btn-primary">{{'projectList.search.btnSearch' | translate}}</button>
@@ -49,7 +50,7 @@
           {{ project.projectNumber }}
         </td>
         <td>{{ project.name }}</td>
-        <td>{{ project.status }}</td>
+        <td>{{ Status[project.status] }}</td>
         <td>{{ project.customer }}</td>
         <td>{{ formatDate(project.startDate) }}</td>
         <td>

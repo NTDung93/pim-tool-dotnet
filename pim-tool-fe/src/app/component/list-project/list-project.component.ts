@@ -6,6 +6,7 @@ import { Project, Status } from 'src/app/model/project';
 import { ProjectService } from 'src/app/service/project.service';
 import { SharedService } from 'src/app/service/shared.service';
 import { TranslateService } from '@ngx-translate/core';
+import { ToastService } from 'angular-toastify';
 
 @Component({
   selector: '.list-project',
@@ -18,7 +19,7 @@ export class ListProjectComponent implements OnInit {
   protected readonly Status = Status;
   projectsArr: Project[] = []; // Your projects array
   savedSearchText: any;
-  savedStatus!: String;
+  savedStatus: String = '';
 
   selectedItems: Project[] = [];
   page = 1;
@@ -26,7 +27,8 @@ export class ListProjectComponent implements OnInit {
   constructor(
     private projectService: ProjectService,
     private router: Router,
-    private sharedService: SharedService
+    private sharedService: SharedService,
+    private _toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -82,18 +84,15 @@ export class ListProjectComponent implements OnInit {
   }
 
   public searchProjects(searchForm: NgForm): void {
-    console.log(searchForm.value);
-
-    if (searchForm.value.searchText == '' && searchForm.value.status == '') {
+    if ((searchForm.value.searchText == '' && searchForm.value.status == '') || (searchForm.value.searchText == null && searchForm.value.status == null)) {
       this.getProjects();
       return;
     }
 
-    this.sharedService.setSavedSearchText(searchForm.value.searchText);
-    this.sharedService.setSavedSatus(searchForm.value.status);
+    this.setSavedValue(searchForm.value.searchText, searchForm.value.status);
 
     this.projectService
-      .searchProjects(searchForm.value.searchText, searchForm.value.status)
+      .searchProjects(searchForm.value.searchText ? searchForm.value.searchText : '', searchForm.value.status ? searchForm.value.status : '')
       .subscribe(
         (response: Project[]) => {
           console.log('day la search');
@@ -101,15 +100,22 @@ export class ListProjectComponent implements OnInit {
           this.projects = response;
         },
         (error: HttpErrorResponse) => {
-          alert(error.message);
+          console.log(error);
+          if (error.status == 404) {
+            this._toastService.info('Project not found');
+          }else{
+            this._toastService.error(error.message);
+          }
         }
       );
   }
 
   public resetSearchHandle(searchForm: NgForm) {
-    searchForm.reset();
-    this.sharedService.setSavedSearchText('');
-    this.sharedService.setSavedSatus('');
+    this.setSavedValue('', '');
+    searchForm.form.patchValue({
+      searchText: '',
+      status: '',
+    });
     this.getProjects();
   }
 
@@ -177,5 +183,12 @@ export class ListProjectComponent implements OnInit {
 
   formatDate(date: Date): string | null {
     return this.sharedService.formatDate(date);
+  }
+
+  public setSavedValue (searchText: any, status: any) {
+    this.sharedService.setSavedSearchText(searchText);
+    this.sharedService.setSavedSatus(status);
+    this.savedStatus = this.sharedService.getSavedSatus();
+    this.savedSearchText = this.sharedService.getSavedSearchText();
   }
 }

@@ -12,6 +12,7 @@ import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { MatDialogModule } from '@angular/material/dialog';
 import { NgxTranslateModule } from './translate/translate.module';
 import { DatePipe } from '@angular/common';
+import { AngularToastifyModule, ToastService } from 'angular-toastify';
 @NgModule({
   declarations: [AppComponent, ListProjectComponent, ProjectDetailComponent],
   imports: [
@@ -23,8 +24,9 @@ import { DatePipe } from '@angular/common';
     NgbPaginationModule,
     MatDialogModule,
     NgxTranslateModule,
+    AngularToastifyModule
   ],
-  providers: [DatePipe],
+  providers: [DatePipe, ToastService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
