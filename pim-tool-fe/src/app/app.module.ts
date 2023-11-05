@@ -11,6 +11,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { MatDialogModule } from '@angular/material/dialog';
 import { NgxTranslateModule } from './translate/translate.module';
+import { DatePipe } from '@angular/common';
 @NgModule({
   declarations: [AppComponent, ListProjectComponent, ProjectDetailComponent],
   imports: [
@@ -23,7 +24,7 @@ import { NgxTranslateModule } from './translate/translate.module';
     MatDialogModule,
     NgxTranslateModule,
   ],
-  providers: [],
+  providers: [DatePipe],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

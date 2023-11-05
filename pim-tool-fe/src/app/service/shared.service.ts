@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -8,7 +9,7 @@ export class SharedService {
   private savedSatus!: String;
   private isUpdate: boolean = false;
 
-  constructor() {}
+  constructor(private datePipe: DatePipe) {}
 
   setSavedSearchText(value: String) {
     this.savedSearchText = value;
@@ -32,5 +33,9 @@ export class SharedService {
 
   getIsUpdate(): boolean {
     return this.isUpdate;
+  }
+
+  formatDate(date: Date): string | null {
+    return this.datePipe.transform(date, 'dd.MM.yyyy');
   }
 }
