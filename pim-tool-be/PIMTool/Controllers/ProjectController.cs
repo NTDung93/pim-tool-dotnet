@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,22 @@ namespace PIMTool.Controllers
         public async Task<ActionResult<IEnumerable<ProjectDto>>> Get()
         {
             var entities = await _projectService.GetProjects();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (!entities.Any())
+            {
+                return NotFound();
+            }
+            return Ok(_mapper.Map<IEnumerable<ProjectDto>>(entities));
+        }
+
+        //search project by name or status
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<ProjectDto>>> Search([FromQuery] string searchText, [FromQuery] int? status)
+        {
+            var entities = await _projectService.Search(searchText, status);
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);

@@ -8,6 +8,7 @@ namespace PIMTool.Core.Interfaces.Services
         Task DeleteAsync(Project project);
         Task<Project?> GetAsync(int id, CancellationToken cancellationToken = default);
         Task<IEnumerable<Project>> GetProjects();
+        Task<IEnumerable<Project>> Search(string? searchVal, int? status);
         Task UpdateAsync();
     }
 }

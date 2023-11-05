@@ -43,6 +43,28 @@ namespace PIMTool.Services
             return entities;
         }
 
+        public async Task<IEnumerable<Project>> Search(string? searchText, int? status)
+        {
+            if (!string.IsNullOrEmpty(searchText) && status.HasValue)
+            {
+                return await _pimContext.Projects.Include(x=>x.Group.GroupLeader)
+                    .Where(x=>
+                        (
+                            x.Name.ToLower().Contains(searchText.Trim().ToLower()) 
+                            || x.Customer.ToLower().Contains(searchText.Trim().ToLower()) 
+                            || x.ProjectNumber.ToString().Contains(searchText.Trim().ToLower())
+                        ) 
+                        && x.Status == (Core.Domain.Enums.Status)status).ToListAsync();
+            }else if (!string.IsNullOrEmpty(searchText) && !status.HasValue)
+            {
+                  return await _pimContext.Projects.Include(x=>x.Group.GroupLeader)
+                    .Where(x=>x.Name.ToLower().Contains(searchText.Trim().ToLower()) 
+                        || x.Customer.ToLower().Contains(searchText.Trim().ToLower()) 
+                        || x.ProjectNumber.ToString().Contains(searchText.Trim().ToLower())).ToListAsync();
+            }
+            return await _pimContext.Projects.Include(x => x.Group.GroupLeader).Where(x => x.Status == (Core.Domain.Enums.Status)status).ToListAsync();
+        }
+
         public async Task UpdateAsync()
         {
             await _repository.SaveChangesAsync();

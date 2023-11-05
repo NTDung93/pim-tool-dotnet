@@ -1,10 +1,10 @@
 import { Group } from './group';
 
 export enum Status {
-  NEW = 'NEW',
-  PLA = 'PLA',
-  INP = 'INP',
-  FIN = 'FIN',
+  NEW = 0,
+  PLA = 1,
+  INP = 2,
+  FIN = 3,
 }
 
 export interface Project {
