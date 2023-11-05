@@ -14,7 +14,7 @@
         <label for="number">{{ 'projectDetail.projectNumber' | translate }} <span style="color: red">*</span></label>
         <div class="input-container">
           <div class="input-container">
-            <input type="text" ngModel [readonly]="editMode" [ngModel]="editMode ? updateProject.number: null"
+            <input type="text" ngModel [readonly]="editMode" [ngModel]="editMode ? updateProject.projectNumber: null"
               *ngIf="!editMode || editMode" name="number" class="form-control short-input" id="nanumberme"
               [ngClass]="{ 'red-border': numberErr !== '' }" required />
           </div>

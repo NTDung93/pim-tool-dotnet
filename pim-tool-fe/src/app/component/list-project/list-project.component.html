@@ -46,12 +46,12 @@
         </td>
         <td style="text-decoration: underline; cursor: pointer"
           (click)="navigateToProjectDetail(project); changeIsUpdate(true)">
-          {{ project.number }}
+          {{ project.projectNumber }}
         </td>
         <td>{{ project.name }}</td>
         <td>{{ project.status }}</td>
         <td>{{ project.customer }}</td>
-        <td>{{ project.startDate }}</td>
+        <td>{{ formatDate(project.startDate) }}</td>
         <td>
           <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#exampleModal"
             style="background-color: transparent" (click)="setProjectIdDelete(project.id)"

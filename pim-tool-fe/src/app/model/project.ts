@@ -9,7 +9,7 @@ export enum Status {
 
 export interface Project {
   id: number;
-  number: number;
+  projectNumber: number;
   name: string;
   customer: string;
   group: Group;

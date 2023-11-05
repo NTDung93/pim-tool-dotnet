@@ -51,7 +51,7 @@ export class ListProjectComponent implements OnInit {
         console.log(response);
 
         this.projects = response;
-        this.projects.sort((a, b) => a.number - b.number);
+        this.projects.sort((a, b) => a.projectNumber - b.projectNumber);
       },
       (error: HttpErrorResponse) => {
         alert(error.message);
@@ -164,14 +164,18 @@ export class ListProjectComponent implements OnInit {
   }
 
   navigateToUpdateProject(project: Project) {
-    this.router.navigate(['/update', project.number]);
+    this.router.navigate(['/update', project.projectNumber]);
   }
 
   navigateToProjectDetail(project: Project) {
-    this.router.navigate(['/project', project.number]);
+    this.router.navigate(['/project', project.projectNumber]);
   }
 
   changeIsUpdate(val: boolean) {
     this.sharedService.setIsUpdate(val);
+  }
+
+  formatDate(date: Date): string | null {
+    return this.sharedService.formatDate(date);
   }
 }
