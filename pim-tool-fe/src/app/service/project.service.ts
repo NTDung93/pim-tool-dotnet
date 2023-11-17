@@ -30,7 +30,7 @@ export class ProjectService {
 
   public deleteProject(projectId: number): Observable<void> {
     return this.http.delete<void>(
-      `${this.projectUrl}/project/delete?id=${projectId}`
+      `${this.projectUrl}/Project?id=${projectId}`
     );
   }
 

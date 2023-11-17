@@ -137,7 +137,7 @@ namespace PIMTool.Controllers
         {
             var project = await _projectService.GetAsync(id);
             await _projectService.DeleteAsync(project);
-            return Ok(project);
+            return Ok(_mapper.Map<ProjectDto>(project));
         }
 
         [HttpGet("{id}")]

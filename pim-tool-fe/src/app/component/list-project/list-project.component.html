@@ -29,14 +29,14 @@
   </form>
   <table style="margin-bottom: 1rem">
     <thead>
-      <tr>
-        <th></th>
-        <th>{{ 'projectList.tableHeading.number' | translate }}</th>
-        <th>{{ 'projectList.tableHeading.name' | translate }}</th>
-        <th>{{ 'projectList.tableHeading.status' | translate }}</th>
-        <th>{{ 'projectList.tableHeading.customer' | translate }}</th>
-        <th>{{ 'projectList.tableHeading.start' | translate }}</th>
-        <th>{{ 'projectList.tableHeading.delete' | translate }}</th>
+      <tr class="tableHeading">
+        <th class="tableHeading_select"></th>
+        <th class="tableHeading_number">{{ 'projectList.tableHeading.number' | translate }}</th>
+        <th class="tableHeading_name">{{ 'projectList.tableHeading.name' | translate }}</th>
+        <th class="tableHeading_status">{{ 'projectList.tableHeading.status' | translate }}</th>
+        <th class="tableHeading_customer">{{ 'projectList.tableHeading.customer' | translate }}</th>
+        <th class="tableHeading_start">{{ 'projectList.tableHeading.start' | translate }}</th>
+        <th class="tableHeading_delete">{{ 'projectList.tableHeading.delete' | translate }}</th>
       </tr>
     </thead>
     <tbody>
@@ -50,7 +50,7 @@
           {{ project.projectNumber }}
         </td>
         <td>{{ project.name }}</td>
-        <td>{{ Status[project.status] }}</td>
+        <td>{{ Status[project.status] | statusPipe }}</td>
         <td>{{ project.customer }}</td>
         <td>{{ formatDate(project.startDate) }}</td>
         <td>
@@ -65,12 +65,12 @@
   </table>
 
   <div *ngIf="selectedItems.length > 0" class="selected-items">
-    <p style="margin: auto 0">{{ selectedItems.length }} items selected</p>
+    <p style="margin: auto 0">{{ selectedItems.length }} {{ 'projectList.delete.itemsSelected' | translate }}</p>
 
     <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#exampleModal2"
       style="background-color: transparent">
       <p style="color: red; cursor: pointer">
-        delete selected items
+        {{ 'projectList.delete.deleteSelected' | translate }}
         <span>
           <i style="color: red; cursor: pointer; margin-left: 5px" class="fa-regular fa-trash-can"></i></span>
       </p>
@@ -137,10 +137,10 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary " data-bs-dismiss="modal">
-          {{ 'projectList.delete.question' | translate }}
+          {{ 'projectList.delete.btnClose' | translate }}
         </button>
         <button type="button" (click)="deleteSelectedProject()" class="btn btn-danger" data-bs-dismiss="modal">
-          {{ 'projectList.delete.question' | translate }}
+          {{ 'projectList.delete.btnDelete' | translate }}
         </button>
       </div>
     </div>

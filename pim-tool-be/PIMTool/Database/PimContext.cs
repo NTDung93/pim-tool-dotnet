@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PIMTool.Core.Domain.Entities;
+using System.Configuration;
 
 namespace PIMTool.Database
 {
