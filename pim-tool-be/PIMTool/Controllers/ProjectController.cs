@@ -56,6 +56,12 @@ namespace PIMTool.Controllers
         [HttpPost]
         public async Task<ActionResult<ProjectDto>> CreateProject([FromBody] ProjectDto projectDto)
         {
+            // not allow empty any field
+            // check duplicate project number
+            // visa does not exist in employee table
+            // handle unexpected error
+            // start date must be less than end date
+
             var project = _mapper.Map<Project>(projectDto);
             try
             {

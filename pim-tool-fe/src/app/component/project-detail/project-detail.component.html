@@ -60,9 +60,17 @@
       </div>
       <div class="form-group">
         <label for="member">{{ 'projectDetail.members' | translate }} </label>
-        <div class="input-container">
+        <!-- <div class="input-container">
           <input type="text" [ngModel]="editMode ? updateProject.members : null" *ngIf="!editMode || editMode"
             name="member" class="form-control" id="member" />
+         -->
+        <div class="input-container">
+          <div class="card-member">
+            <span class="p-fluid">
+              <p-autoComplete [(ngModel)]="selectedItems" [suggestions]="items!" (completeMethod)="filterMember($event)"
+                [multiple]="true"></p-autoComplete>
+            </span>
+          </div>
         </div>
       </div>
       <div class="form-group">

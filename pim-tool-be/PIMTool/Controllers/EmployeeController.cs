@@ -37,6 +37,22 @@ namespace PIMTool.Controllers
             return base.Ok(_mapper.Map<IEnumerable<EmployeeDto>>(entities));
         }
 
+        //search by visa, first name, last name of employee
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<EmployeeDto>>> Search([FromQuery] string searchText)
+        {
+            var entities = await _employeeService.Search(searchText);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (!entities.Any())
+            {
+                return NotFound();
+            }
+            return base.Ok(_mapper.Map<IEnumerable<EmployeeDto>>(entities));
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<EmployeeDto>> Get([FromRoute][Required] int id)
         {

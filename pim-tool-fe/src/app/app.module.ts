@@ -13,6 +13,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { NgxTranslateModule } from './translate/translate.module';
 import { DatePipe } from '@angular/common';
 import { AngularToastifyModule, ToastService } from 'angular-toastify';
+import {AutoCompleteModule} from 'primeng/autocomplete';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 @NgModule({
   declarations: [AppComponent, ListProjectComponent, ProjectDetailComponent, StatusPipe],
   imports: [
@@ -24,7 +26,9 @@ import { AngularToastifyModule, ToastService } from 'angular-toastify';
     NgbPaginationModule,
     MatDialogModule,
     NgxTranslateModule,
-    AngularToastifyModule
+    AngularToastifyModule,
+    AutoCompleteModule,
+    BrowserAnimationsModule,
   ],
   providers: [DatePipe, ToastService],
   bootstrap: [AppComponent],

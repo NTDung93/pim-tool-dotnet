@@ -7,11 +7,11 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class GroupService {
-  private projectUrl: string = 'http://localhost:8080';
+  private projectUrl: string = 'https://localhost:7099/api';
 
   constructor(private http: HttpClient) {}
 
   public getGroups(): Observable<Group[]> {
-    return this.http.get<Group[]>(`${this.projectUrl}/group/all`);
+    return this.http.get<Group[]>(`${this.projectUrl}/Group`);
   }
 }

@@ -8,11 +8,20 @@ import { Group } from 'src/app/model/group';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SharedService } from 'src/app/service/shared.service';
 import { TranslateService } from '@ngx-translate/core';
+import { PrimeNGConfig } from 'primeng/api';
+import { AutoCompleteModule } from 'primeng/autocomplete';
+import { EmployeeService } from 'src/app/service/employee.service';
+interface AutoCompleteCompleteEvent {
+  originalEvent: Event;
+  query: string;
+}
+
 @Component({
   selector: 'app-project-detail',
   templateUrl: './project-detail.component.html',
   styleUrls: ['./project-detail.component.scss'],
 })
+
 export class ProjectDetailComponent {
   @ViewChild('alertPopup') alertPopup!: ElementRef;
   siteLanguage = 'English';
@@ -30,18 +39,24 @@ export class ProjectDetailComponent {
   globalErr: string = 'projectDetail.globalError';
   projectSent!: Project;
   isFailed: boolean = false;
+  selectedItems: any[] | undefined;
+  items: any[] | undefined;
 
   constructor(
     private projectService: ProjectService,
     private groupService: GroupService,
+    private employeeService: EmployeeService,
     private router: Router,
     private route: ActivatedRoute,
     public sharedService: SharedService,
-    private translate: TranslateService
-  ) {}
+    private translate: TranslateService,
+    private primengConfig: PrimeNGConfig
+  ) { }
 
   ngOnInit(): void {
+    this.primengConfig.ripple = true;
     this.getGroups();
+    this.loadEmps();
     this.globalErr = 'projectDetail.globalError';
     const projectNumber: any =
       this.route.snapshot.paramMap.get('projectNumber');
@@ -51,6 +66,37 @@ export class ProjectDetailComponent {
       this.actionTitle = 'projectDetail.update.title';
       this.btnSubmitContent = 'projectDetail.update.btnUpdate';
     }
+  }
+  
+  filterMember(event: AutoCompleteCompleteEvent) {
+    console.log(event.query);
+    this.searchEmp(event.query);
+  }
+
+  searchEmp(name: string){
+    this.employeeService.searchEmployees(name).subscribe(
+      (response: any) => {
+        console.log(response);
+        this.items = response.map((emp: any) => emp.visa + ': ' + emp.firstName + ' ' + emp.lastName);
+        console.log(this.items);
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+      }
+    );
+  }
+
+  loadEmps() {
+    this.employeeService.getEmployees().subscribe(
+      (response: any) => {
+        console.log(response);
+        this.items = response.map((emp: any) => emp.visa + ': ' + emp.firstName + ' ' + emp.lastName);
+        console.log(this.items);
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+      }
+    );
   }
 
   changeSiteLanguage(localeCode: string): void {
