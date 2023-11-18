@@ -61,6 +61,7 @@ namespace PIMTool.Controllers
             // visa does not exist in employee table
             // handle unexpected error
             // start date must be less than end date
+            // enter member not found although have been warned
 
             var project = _mapper.Map<Project>(projectDto);
             try

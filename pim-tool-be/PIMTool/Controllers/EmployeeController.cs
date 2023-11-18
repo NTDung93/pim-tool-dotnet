@@ -41,7 +41,11 @@ namespace PIMTool.Controllers
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<EmployeeDto>>> Search([FromQuery] string searchText)
         {
-            var entities = await _employeeService.Search(searchText);
+            var entities = await _employeeService.GetEmployees();
+            if (searchText != null)
+            {
+                entities = await _employeeService.Search(searchText);
+            }
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);

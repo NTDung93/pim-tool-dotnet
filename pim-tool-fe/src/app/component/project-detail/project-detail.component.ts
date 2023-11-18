@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ProjectService } from 'src/app/service/project.service';
 import { Project } from 'src/app/model/project';
@@ -39,8 +39,12 @@ export class ProjectDetailComponent {
   globalErr: string = 'projectDetail.globalError';
   projectSent!: Project;
   isFailed: boolean = false;
-  selectedItems: any[] | undefined;
-  items: any[] | undefined;
+  empList = [];
+  // selectedEmp: FormControl | undefined;
+  selectedEmp: any;
+  emptyMessage: "No employees found" | undefined;
+  formGroup: FormGroup | undefined;
+  selectedEmployee: string[] = [];
 
   constructor(
     private projectService: ProjectService,
@@ -54,9 +58,11 @@ export class ProjectDetailComponent {
   ) { }
 
   ngOnInit(): void {
+    //   this.formGroup = new FormGroup({
+    //     selectedEmp: new FormControl<any>(null)
+    // });
     this.primengConfig.ripple = true;
     this.getGroups();
-    this.loadEmps();
     this.globalErr = 'projectDetail.globalError';
     const projectNumber: any =
       this.route.snapshot.paramMap.get('projectNumber');
@@ -67,36 +73,37 @@ export class ProjectDetailComponent {
       this.btnSubmitContent = 'projectDetail.update.btnUpdate';
     }
   }
+
+  search($event: any) {
+    this.employeeService.searchEmployees($event.query).subscribe(
+      (response) => {
+        this.empList = response
+      },
+      (error: HttpErrorResponse) => {
+        this.empList = []
+      }
+    )
+  }
+
+  selectEmpId(value: any) {
+    console.log("select value: ", value);
+    
+    if (!this.selectedEmployee.includes(value.id)) {
+      this.selectedEmployee.push(value.id);
+    }
+    
+    console.log("selectedEmp: ", this.selectedEmployee);
+  }
   
-  filterMember(event: AutoCompleteCompleteEvent) {
-    console.log(event.query);
-    this.searchEmp(event.query);
-  }
-
-  searchEmp(name: string){
-    this.employeeService.searchEmployees(name).subscribe(
-      (response: any) => {
-        console.log(response);
-        this.items = response.map((emp: any) => emp.visa + ': ' + emp.firstName + ' ' + emp.lastName);
-        console.log(this.items);
-      },
-      (error: HttpErrorResponse) => {
-        alert(error.message);
-      }
-    );
-  }
-
-  loadEmps() {
-    this.employeeService.getEmployees().subscribe(
-      (response: any) => {
-        console.log(response);
-        this.items = response.map((emp: any) => emp.visa + ': ' + emp.firstName + ' ' + emp.lastName);
-        console.log(this.items);
-      },
-      (error: HttpErrorResponse) => {
-        alert(error.message);
-      }
-    );
+  unselectEmpId(value: any) {
+    console.log("unselect value: ", value);
+    const index = this.selectedEmployee.indexOf(value.id);
+    
+    if (index !== -1) {
+      this.selectedEmployee.splice(index, 1);
+    }
+    
+    console.log("selectedEmp: ", this.selectedEmployee);
   }
 
   changeSiteLanguage(localeCode: string): void {
@@ -160,6 +167,9 @@ export class ProjectDetailComponent {
         return;
       }
     }
+
+    var listMems: number[] = [];
+
 
     this.projectService.addProject(addForm.value).subscribe(
       (response: Project) => {

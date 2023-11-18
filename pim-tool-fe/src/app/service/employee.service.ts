@@ -16,10 +16,8 @@ export class EmployeeService {
     return this.http.get<Project[]>(`${this.empUrl}/Employee`);
   }
 
-  public searchEmployees(
-    searchText: String
-  ): Observable<Employee[]> {
-    return this.http.get<Employee[]>(
+  public searchEmployees(searchText: String){
+    return this.http.get<any>(
       `${this.empUrl}/Employee/search?searchText=${searchText}`
     );
   }
