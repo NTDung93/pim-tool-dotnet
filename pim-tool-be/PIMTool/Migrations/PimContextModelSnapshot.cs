@@ -173,6 +173,7 @@ namespace PIMTool.Migrations
                     b.HasOne("PIMTool.Core.Domain.Entities.Project", "Project")
                         .WithMany("ProjectEmployees")
                         .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.Navigation("Employee");

@@ -13,12 +13,14 @@ namespace PIMTool.Controllers
     public class ProjectController : BaseApiController
     {
         private readonly IProjectService _projectService;
+        private readonly IProjectEmployeeService _projectEmployeeService;
         private readonly IMapper _mapper;
 
-        public ProjectController(IProjectService projectService,
+        public ProjectController(IProjectService projectService, IProjectEmployeeService projectEmployeeService,
             IMapper mapper)
         {
             _projectService = projectService;
+            _projectEmployeeService = projectEmployeeService;
             _mapper = mapper;
         }
 
@@ -54,7 +56,7 @@ namespace PIMTool.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ProjectDto>> CreateProject([FromBody] ProjectDto projectDto)
+        public async Task<ActionResult<ProjectDto>> CreateProject([FromBody] ProjectMembersDto projectMembersDto)
         {
             // not allow empty any field
             // check duplicate project number
@@ -63,11 +65,25 @@ namespace PIMTool.Controllers
             // start date must be less than end date
             // enter member not found although have been warned
 
-            var project = _mapper.Map<Project>(projectDto);
+            var project = _mapper.Map<Project>(projectMembersDto.ProjectDto);
             try
             {
-                await _projectService.AddAsync(project);
-            }catch{
+                var addedProject = await _projectService.AddAsync(project);
+                if (projectMembersDto.ListEmpId.Length > 0)
+                {
+                    foreach (var empId in projectMembersDto.ListEmpId)
+                    {
+                        var projectEmp = new ProjectEmployee
+                        {
+                            EmployeeId = empId,
+                            ProjectId = addedProject.Id
+                        };
+                        await _projectEmployeeService.AddAsync(projectEmp);
+                    }
+                }
+            }
+            catch
+            {
 
             }
             var listProjects = await _projectService.GetProjects();

@@ -2,7 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ProjectService } from 'src/app/service/project.service';
-import { Project } from 'src/app/model/project';
+import { Project, Status } from 'src/app/model/project';
 import { GroupService } from '../../service/group.service';
 import { Group } from 'src/app/model/group';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -11,6 +11,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { PrimeNGConfig } from 'primeng/api';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { EmployeeService } from 'src/app/service/employee.service';
+import { ProjectMembers } from '../../model/project';
 interface AutoCompleteCompleteEvent {
   originalEvent: Event;
   query: string;
@@ -44,7 +45,7 @@ export class ProjectDetailComponent {
   selectedEmp: any;
   emptyMessage: "No employees found" | undefined;
   formGroup: FormGroup | undefined;
-  selectedEmployee: string[] = [];
+  selectedEmployee: number[] = [];
 
   constructor(
     private projectService: ProjectService,
@@ -143,6 +144,7 @@ export class ProjectDetailComponent {
   }
 
   public onAddProject(addForm: NgForm): void {
+    addForm.value.status = Status[addForm.value.status];
     console.log(addForm.value);
 
     if (addForm.invalid) {
@@ -162,18 +164,21 @@ export class ProjectDetailComponent {
     if (addForm.value.endDate != null) {
       const endTime = new Date(addForm.value.endDate);
 
-      if (startTime >= endTime) {
+      if (startTime > endTime) {
         this.ennDateErr = 'projectDetail.startAfterEnd';
         return;
       }
     }
 
-    var listMems: number[] = [];
+    var ProjectMembers: ProjectMembers;
+    ProjectMembers = {
+      ProjectDto: addForm.value,
+      ListEmpId: this.selectedEmployee
+    }
 
-
-    this.projectService.addProject(addForm.value).subscribe(
-      (response: Project) => {
-        console.log(response);
+    this.projectService.addProject(ProjectMembers).subscribe(
+      (response: any) => {
+        console.log("list projects: ", response);
         addForm.reset();
         this.router.navigateByUrl('/list');
       },

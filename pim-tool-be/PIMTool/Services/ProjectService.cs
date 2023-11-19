@@ -17,15 +17,17 @@ namespace PIMTool.Services
             this._pimContext = pimContext;
         }
 
-        public async Task AddAsync(Project project)
+        public async Task<Project> AddAsync(Project project)
         {
             await _repository.AddAsync(project);
             await _repository.SaveChangesAsync();
+            return project;
         }
 
         public async Task DeleteAsync(Project project)
         {
-            _repository.Delete(project);
+            var projectWithEmployees = await _pimContext.Projects.Include(x=>x.ProjectEmployees).FirstOrDefaultAsync(x=>x.Id == project.Id);
+            _repository.Delete(projectWithEmployees);
             await _repository.SaveChangesAsync();
         }
 

@@ -11,13 +11,11 @@
     <form #detailForm="ngForm" (ngSubmit)="editMode ? onUpdateProject(detailForm) : onAddProject(detailForm)">
 
       <div class="form-group">
-        <label for="number">{{ 'projectDetail.projectNumber' | translate }} <span style="color: red">*</span></label>
+        <label for="projectNumber">{{ 'projectDetail.projectNumber' | translate }} <span style="color: red">*</span></label>
         <div class="input-container">
-          <div class="input-container">
-            <input type="text" ngModel [readonly]="editMode" [ngModel]="editMode ? updateProject.projectNumber: null"
-              *ngIf="!editMode || editMode" name="number" class="form-control short-input" id="nanumberme"
-              [ngClass]="{ 'red-border': numberErr !== '' }" required />
-          </div>
+          <input type="text" [readonly]="editMode" [ngModel]="editMode ? updateProject.projectNumber: null"
+            *ngIf="!editMode || editMode" name="projectNumber" class="form-control short-input" id="projectNumber"
+            [ngClass]="{ 'red-border': numberErr !== '' }" required />
         </div>
       </div>
 
@@ -47,10 +45,10 @@
       </div>
 
       <div class="form-group">
-        <label for="group">{{ 'projectDetail.group' | translate }} <span style="color: red">*</span></label>
+        <label for="groupId">{{ 'projectDetail.group' | translate }} <span style="color: red">*</span></label>
         <div class="input-container">
           <select id="groupId" name="groupId" [ngModel]="editMode ? updateProject.groupId : null"
-            *ngIf="!editMode || editMode" class="short-input">
+            *ngIf="!editMode || editMode" class="short-input" required>
             <option *ngFor="let group of groups" value="{{ group?.id }}">
               Group {{ group?.id }} ({{ group?.groupLeader?.visa }})
             </option>
@@ -58,51 +56,26 @@
         </div>
       </div>
 
-      <!-- <div class="form-group">
-        <label for="member">{{ 'projectDetail.members' | translate }} </label>
-        <div class="input-container">
-          <div style="width: 100%;">
-            <form [formGroup]="formGroup!">
-              <p-autoComplete formControlName="selectedEmp" [suggestions]="empList" (completeMethod)="search($event)"
-                [showEmptyMessage]="true" [emptyMessage]="emptyMessage" (onSelect)="selectProId($event)" [delay]="800"
-                [multiple]="true" [completeOnFocus]="true" [style]="{'display': 'block', 'width': '100%'}" [size]="20">
-                <ng-template let-emp pTemplate="item">
-                  <div class="flex align-items-center gap-2">
-                    <div>{{ emp.visa }}: {{emp.firstName}} {{emp.lastName}}</div>
-                  </div>
-                </ng-template>
-
-                <ng-template let-val pTemplate="selectedItem">
-                  <div class="flex align-items-center gap-2">
-                    <div>{{ val.visa }}: {{val.firstName}} {{val.lastName}}</div>
-                  </div>
-                </ng-template>
-              </p-autoComplete>
-            </form>
-          </div>
-        </div>
-      </div> -->
-
       <div class="form-group">
         <label for="member">{{ 'projectDetail.members' | translate }} </label>
         <div class="input-container">
           <div style="width: 100%;">
-              <p-autoComplete [(ngModel)]="selectedEmp" [suggestions]="empList" (completeMethod)="search($event)"
-                [showEmptyMessage]="true" [emptyMessage]="emptyMessage" (onSelect)="selectEmpId($event)" [delay]="800"
-                [multiple]="true" [completeOnFocus]="true" [style]="{'display': 'block', 'width': '100%'}" [size]="20"
-                (onUnselect)="unselectEmpId($event)" [unique]="true">
-                <ng-template let-emp pTemplate="item">
-                  <div class="flex align-items-center gap-2">
-                    <div>{{ emp.visa }}: {{emp.firstName}} {{emp.lastName}}</div>
-                  </div>
-                </ng-template>
-      
-                <ng-template let-val pTemplate="selectedItem">
-                  <div class="flex align-items-center gap-2">
-                    <div>{{ val.visa }}: {{val.firstName}} {{val.lastName}}</div>
-                  </div>
-                </ng-template>
-              </p-autoComplete>
+            <p-autoComplete [(ngModel)]="selectedEmp" [suggestions]="empList" (completeMethod)="search($event)"
+              [showEmptyMessage]="true" [emptyMessage]="emptyMessage" (onSelect)="selectEmpId($event)" [delay]="800"
+              [multiple]="true" [completeOnFocus]="true" [style]="{'display': 'block', 'width': '100%'}" [size]="20"
+              (onUnselect)="unselectEmpId($event)" [unique]="true" inputId="member">
+              <ng-template let-emp pTemplate="item">
+                <div class="flex align-items-center gap-2">
+                  <div>{{ emp.visa }}: {{emp.firstName}} {{emp.lastName}}</div>
+                </div>
+              </ng-template>
+
+              <ng-template let-val pTemplate="selectedItem">
+                <div class="flex align-items-center gap-2">
+                  <div>{{ val.visa }}: {{val.firstName}} {{val.lastName}}</div>
+                </div>
+              </ng-template>
+            </p-autoComplete>
           </div>
         </div>
       </div>
@@ -111,7 +84,7 @@
         <label for="status">{{ 'projectDetail.status' | translate }} <span style="color: red">*</span></label>
         <div class="input-container">
           <select id="status" name="status" [ngModel]="editMode ? updateProject.status : null"
-            *ngIf="!editMode || editMode" class="short-input">
+            *ngIf="!editMode || editMode" class="short-input" required>
             <option value="" disabled>NEW</option>
             <option value="NEW">New</option>
             <option value="PLA">Planned</option>
@@ -161,5 +134,11 @@
   </div>
 </div>
 
-
+<pre>{{ detailForm.value.projectNumber | json }}</pre>
+<pre>{{ detailForm.value.name | json }}</pre>
+<pre>{{ detailForm.value.customer | json }}</pre>
+<pre>{{ detailForm.value.groupId | json }}</pre>
+<pre>{{ detailForm.value.status | json }}</pre>
+<pre>{{ detailForm.value.startDate | json }}</pre>
+<pre>{{ detailForm.value.endDate | json }}</pre>
 

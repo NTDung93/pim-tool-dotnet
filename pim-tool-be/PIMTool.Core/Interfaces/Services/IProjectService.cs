@@ -4,7 +4,7 @@ namespace PIMTool.Core.Interfaces.Services
 {
     public interface IProjectService
     {
-        Task AddAsync(Project project);
+        Task<Project> AddAsync(Project project);
         Task DeleteAsync(Project project);
         Task<Project?> GetAsync(int id, CancellationToken cancellationToken = default);
         Task<IEnumerable<Project>> GetProjects();
