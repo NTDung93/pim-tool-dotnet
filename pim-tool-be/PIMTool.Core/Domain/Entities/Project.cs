@@ -2,6 +2,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace PIMTool.Core.Domain.Entities
 {
@@ -22,14 +24,17 @@ namespace PIMTool.Core.Domain.Entities
         public Status Status { get; set; }
 
         public DateTime StartDate { get; set; }
-
+       
         public DateTime? EndDate { get; set; }
 
         [Timestamp]
         public byte[] Version { get; set; }
 
         public int GroupId { get; set; }
-        public Group Group { get; set; }
+
+        [JsonIgnore]
+        [IgnoreDataMember]
+        public virtual Group Group { get; set; }
 
         public ICollection<ProjectEmployee> ProjectEmployees { get; set; }
 

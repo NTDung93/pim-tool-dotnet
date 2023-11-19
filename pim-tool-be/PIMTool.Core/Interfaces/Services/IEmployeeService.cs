@@ -13,6 +13,7 @@ namespace PIMTool.Core.Interfaces.Services
         Task DeleteAsync(Employee emp);
         Task<Employee> GetAsync(int id);
         Task<IEnumerable<Employee>> GetEmployees();
+        Task<IEnumerable<Employee>> Search(string searchText);
         Task UpdateAsync();
     }
 }

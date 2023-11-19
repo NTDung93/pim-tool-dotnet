@@ -58,7 +58,11 @@
 
             "btnClose": "Fermer",
 
-            "btnDelete": "Supprimer"
+            "btnDelete": "Supprimer",
+
+            "itemsSelected": "éléments sélectionnés",
+
+            "deleteSelected": "Supprimer les éléments sélectionnés"
         }
     },
 

@@ -1,18 +1,28 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ProjectService } from 'src/app/service/project.service';
-import { Project } from 'src/app/model/project';
+import { Project, Status } from 'src/app/model/project';
 import { GroupService } from '../../service/group.service';
 import { Group } from 'src/app/model/group';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SharedService } from 'src/app/service/shared.service';
 import { TranslateService } from '@ngx-translate/core';
+import { PrimeNGConfig } from 'primeng/api';
+import { AutoCompleteModule } from 'primeng/autocomplete';
+import { EmployeeService } from 'src/app/service/employee.service';
+import { ProjectMembers } from '../../model/project';
+interface AutoCompleteCompleteEvent {
+  originalEvent: Event;
+  query: string;
+}
+
 @Component({
   selector: 'app-project-detail',
   templateUrl: './project-detail.component.html',
   styleUrls: ['./project-detail.component.scss'],
 })
+
 export class ProjectDetailComponent {
   @ViewChild('alertPopup') alertPopup!: ElementRef;
   siteLanguage = 'English';
@@ -30,17 +40,29 @@ export class ProjectDetailComponent {
   globalErr: string = 'projectDetail.globalError';
   projectSent!: Project;
   isFailed: boolean = false;
+  empList = [];
+  // selectedEmp: FormControl | undefined;
+  selectedEmp: any;
+  emptyMessage: "No employees found" | undefined;
+  formGroup: FormGroup | undefined;
+  selectedEmployee: number[] = [];
 
   constructor(
     private projectService: ProjectService,
     private groupService: GroupService,
+    private employeeService: EmployeeService,
     private router: Router,
     private route: ActivatedRoute,
     public sharedService: SharedService,
-    private translate: TranslateService
-  ) {}
+    private translate: TranslateService,
+    private primengConfig: PrimeNGConfig
+  ) { }
 
   ngOnInit(): void {
+    //   this.formGroup = new FormGroup({
+    //     selectedEmp: new FormControl<any>(null)
+    // });
+    this.primengConfig.ripple = true;
     this.getGroups();
     this.globalErr = 'projectDetail.globalError';
     const projectNumber: any =
@@ -51,6 +73,38 @@ export class ProjectDetailComponent {
       this.actionTitle = 'projectDetail.update.title';
       this.btnSubmitContent = 'projectDetail.update.btnUpdate';
     }
+  }
+
+  search($event: any) {
+    this.employeeService.searchEmployees($event.query).subscribe(
+      (response) => {
+        this.empList = response
+      },
+      (error: HttpErrorResponse) => {
+        this.empList = []
+      }
+    )
+  }
+
+  selectEmpId(value: any) {
+    console.log("select value: ", value);
+    
+    if (!this.selectedEmployee.includes(value.id)) {
+      this.selectedEmployee.push(value.id);
+    }
+    
+    console.log("selectedEmp: ", this.selectedEmployee);
+  }
+  
+  unselectEmpId(value: any) {
+    console.log("unselect value: ", value);
+    const index = this.selectedEmployee.indexOf(value.id);
+    
+    if (index !== -1) {
+      this.selectedEmployee.splice(index, 1);
+    }
+    
+    console.log("selectedEmp: ", this.selectedEmployee);
   }
 
   changeSiteLanguage(localeCode: string): void {
@@ -90,6 +144,7 @@ export class ProjectDetailComponent {
   }
 
   public onAddProject(addForm: NgForm): void {
+    addForm.value.status = Status[addForm.value.status];
     console.log(addForm.value);
 
     if (addForm.invalid) {
@@ -109,15 +164,21 @@ export class ProjectDetailComponent {
     if (addForm.value.endDate != null) {
       const endTime = new Date(addForm.value.endDate);
 
-      if (startTime >= endTime) {
+      if (startTime > endTime) {
         this.ennDateErr = 'projectDetail.startAfterEnd';
         return;
       }
     }
 
-    this.projectService.addProject(addForm.value).subscribe(
-      (response: Project) => {
-        console.log(response);
+    var ProjectMembers: ProjectMembers;
+    ProjectMembers = {
+      ProjectDto: addForm.value,
+      ListEmpId: this.selectedEmployee
+    }
+
+    this.projectService.addProject(ProjectMembers).subscribe(
+      (response: any) => {
+        console.log("list projects: ", response);
         addForm.reset();
         this.router.navigateByUrl('/list');
       },

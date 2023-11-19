@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PIMTool.Core.Domain.Entities;
+using System.Configuration;
 
 namespace PIMTool.Database
 {
@@ -45,7 +46,7 @@ namespace PIMTool.Database
                 .HasOne(pe => pe.Project)
                 .WithMany(p => p.ProjectEmployees)
                 .HasForeignKey(pe => pe.ProjectId)
-                .OnDelete(DeleteBehavior.ClientSetNull);
+                .OnDelete(DeleteBehavior.ClientCascade);
 
             modelBuilder.Entity<ProjectEmployee>()
                 .HasOne(pe => pe.Employee)

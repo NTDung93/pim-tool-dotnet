@@ -56,6 +56,38 @@
     border-collapse: collapse;
     border: 1px solid var(--line);
 
+    .tableHeading{
+      width: 100%;
+
+      &_select{
+        width: 10%;
+      }
+
+      &_number{
+        width: 10%;
+      }
+
+      &_name{
+        width: 35%;
+      }
+
+      &_status{
+        width: 15%;
+      }
+
+      &_customer{
+        width: 25%;
+      }
+
+      &_start{
+        width: 10%;
+      }
+
+      &_delete{
+        width: 5%;
+      }
+    }
+
     th {
       border: 1px solid var(--line);
       padding: 0.4rem 0.7rem;

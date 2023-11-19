@@ -38,6 +38,14 @@ namespace PIMTool.Services
             return entities;
         }
 
+        public async Task<IEnumerable<Employee>> Search(string searchText)
+        {
+            var formattedSearchText = searchText.ToLower().Trim();
+            return await _repository.Get()
+                .Where(e => e.Visa.ToLower().Contains(formattedSearchText) || e.FirstName.ToLower().Contains(formattedSearchText) || e.LastName.ToLower().Contains(formattedSearchText))
+                .ToListAsync();
+        }
+
         public async Task UpdateAsync()
         {
             await _repository.SaveChangesAsync();

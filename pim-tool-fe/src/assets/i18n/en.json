@@ -60,7 +60,11 @@
 
             "btnClose": "Close",
 
-            "btnDelete": "Delete"
+            "btnDelete": "Delete",
+
+            "itemsSelected": "items selected",
+
+            "deleteSelected": "Delete selected items"
         }
    },
 

@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Pipe, PipeTransform } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Project, Status } from 'src/app/model/project';
@@ -7,6 +7,26 @@ import { ProjectService } from 'src/app/service/project.service';
 import { SharedService } from 'src/app/service/shared.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastService } from 'angular-toastify';
+
+@Pipe({
+  name: 'statusPipe'
+})
+export class StatusPipe implements PipeTransform {
+  transform(status: string): string {
+    switch (status) {
+      case 'INP':
+        return 'In Progress';
+      case 'PLA':
+        return 'Planning';
+      case 'NEW':
+        return 'New';
+      case 'FIN':
+        return 'Finish';
+      default:
+        return 'Unknown';
+    }
+  }
+}
 
 @Component({
   selector: '.list-project',
