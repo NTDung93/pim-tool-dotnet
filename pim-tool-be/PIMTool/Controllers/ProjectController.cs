@@ -4,6 +4,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PIMTool.Core.Domain.Entities;
+using PIMTool.Core.Exceptions;
 using PIMTool.Core.Interfaces.Services;
 using PIMTool.Dtos;
 using PIMTool.Services;
@@ -15,13 +16,15 @@ namespace PIMTool.Controllers
         private readonly IProjectService _projectService;
         private readonly IProjectEmployeeService _projectEmployeeService;
         private readonly IMapper _mapper;
+        private readonly ILogger<ProjectController> _logger;
 
         public ProjectController(IProjectService projectService, IProjectEmployeeService projectEmployeeService,
-            IMapper mapper)
+            IMapper mapper, ILogger<ProjectController> logger)
         {
             _projectService = projectService;
             _projectEmployeeService = projectEmployeeService;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpGet(Name = "GetProjects")]
@@ -58,12 +61,18 @@ namespace PIMTool.Controllers
         [HttpPost]
         public async Task<ActionResult<ProjectDto>> CreateProject([FromBody] ProjectMembersDto projectMembersDto)
         {
-            // not allow empty any field
-            // check duplicate project number
+            // not allow empty any field --> checked
+            // check duplicate project number --> checked
             // visa does not exist in employee table
             // handle unexpected error
-            // start date must be less than end date
+            // start date must be less than end date --> checked
             // enter member not found although have been warned
+
+            var listProjects = await _projectService.GetProjects();
+            if (listProjects.Any(p => p.ProjectNumber == projectMembersDto.ProjectDto.ProjectNumber))
+            {
+                throw new ProjectNumberAlreadyExistsException();
+            }
 
             var project = _mapper.Map<Project>(projectMembersDto.ProjectDto);
             try
@@ -82,11 +91,12 @@ namespace PIMTool.Controllers
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-
+                //_logger.LogError(ex, "Unexpected exception");
+                //return BadRequest(ex.Message);
+                throw new Exception(ex.Message);
             }
-            var listProjects = await _projectService.GetProjects();
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);

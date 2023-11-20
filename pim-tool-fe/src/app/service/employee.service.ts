@@ -12,8 +12,8 @@ export class EmployeeService {
 
   constructor(private http: HttpClient) {}
 
-  public getEmployees(): Observable<Project[]> {
-    return this.http.get<Project[]>(`${this.empUrl}`);
+  public getEmployees(){
+    return this.http.get<any>(`${this.empUrl}`);
   }
 
   public searchEmployees(searchText: String){

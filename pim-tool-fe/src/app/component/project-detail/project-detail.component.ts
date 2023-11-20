@@ -38,14 +38,15 @@ export class ProjectDetailComponent {
   numberErr: string = '';
   ennDateErr: string = '';
   globalErr: string = 'projectDetail.globalError';
+  membersError: string = '';
   projectSent!: Project;
   isFailed: boolean = false;
   empList = [];
-  // selectedEmp: FormControl | undefined;
   selectedEmp: any;
   emptyMessage: "No employees found" | undefined;
   formGroup: FormGroup | undefined;
   selectedEmployee: number[] = [];
+  hasEmp: boolean = false;
 
   constructor(
     private projectService: ProjectService,
@@ -59,11 +60,9 @@ export class ProjectDetailComponent {
   ) { }
 
   ngOnInit(): void {
-    //   this.formGroup = new FormGroup({
-    //     selectedEmp: new FormControl<any>(null)
-    // });
     this.primengConfig.ripple = true;
     this.getGroups();
+    this.getEmployees();
     this.globalErr = 'projectDetail.globalError';
     const projectNumber: any =
       this.route.snapshot.paramMap.get('projectNumber');
@@ -73,6 +72,20 @@ export class ProjectDetailComponent {
       this.actionTitle = 'projectDetail.update.title';
       this.btnSubmitContent = 'projectDetail.update.btnUpdate';
     }
+  }
+
+  getEmployees() {
+    this.employeeService.getEmployees().subscribe(
+      (response) => {
+        this.hasEmp = true;
+        this.empList = response
+        console.log("empList: ", this.empList);
+      },
+      (error: HttpErrorResponse) => {
+        this.empList = []
+        this.hasEmp = false;
+      }
+    )
   }
 
   search($event: any) {
@@ -88,22 +101,22 @@ export class ProjectDetailComponent {
 
   selectEmpId(value: any) {
     console.log("select value: ", value);
-    
+
     if (!this.selectedEmployee.includes(value.id)) {
       this.selectedEmployee.push(value.id);
     }
-    
+
     console.log("selectedEmp: ", this.selectedEmployee);
   }
-  
+
   unselectEmpId(value: any) {
     console.log("unselect value: ", value);
     const index = this.selectedEmployee.indexOf(value.id);
-    
+
     if (index !== -1) {
       this.selectedEmployee.splice(index, 1);
     }
-    
+
     console.log("selectedEmp: ", this.selectedEmployee);
   }
 
@@ -154,7 +167,11 @@ export class ProjectDetailComponent {
     }
 
     const startTime = new Date(addForm.value.startDate);
+    console.log("startTime: ", startTime);
+
     const currentTime = new Date();
+    currentTime.setHours(6, 0, 0, 0);
+    console.log("currentTime: ", currentTime);
 
     if (startTime < currentTime) {
       this.ennDateErr = 'projectDetail.startBeforeCurrent';
@@ -164,10 +181,15 @@ export class ProjectDetailComponent {
     if (addForm.value.endDate != null) {
       const endTime = new Date(addForm.value.endDate);
 
-      if (startTime > endTime) {
+      if (startTime >= endTime) {
         this.ennDateErr = 'projectDetail.startAfterEnd';
         return;
       }
+    }
+
+    if (this.empList.length == 0 && this.hasEmp == true) {
+      this.membersError = 'projectDetail.membersError';
+      return;
     }
 
     var ProjectMembers: ProjectMembers;
@@ -184,7 +206,8 @@ export class ProjectDetailComponent {
       },
       (error: HttpErrorResponse) => {
         console.log(error);
-        if (error.error.includes('project number already existed')) {
+        console.log(error.error.detail);
+        if (error.error.detail.includes('project number already existed')) {
           this.numberErr = 'projectDetail.numberExist';
         }
         this.isFailed = true;
