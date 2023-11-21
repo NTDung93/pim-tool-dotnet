@@ -34,11 +34,11 @@ export class ProjectService {
     );
   }
 
-  public getProjectByNumber(number: number): Observable<Project> {
-    return this.http.get<Project>(`${this.projectUrl}/project/${number}`);
+  public getProjectByNumber(number: number): Observable<any> {
+    return this.http.get<any>(`${this.projectUrl}/${number}`);
   }
 
-  public updateProject(project: Project): Observable<Project> {
-    return this.http.put<Project>(`${this.projectUrl}/project/update`, project);
+  public updateProject(ProjectMembers: ProjectMembers): Observable<Project> {
+    return this.http.put<Project>(`${this.projectUrl}?id=${ProjectMembers.ProjectDto.id}`, ProjectMembers);
   }
 }

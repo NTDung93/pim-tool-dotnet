@@ -92,7 +92,9 @@
 
         "startAfterEnd": "End date must be the same or after Start date",
 
-        "numberExist": "project number already existed",
+        "numberExist": "The project number already existed. Please select a different project number",
+
+        "membersError": "Selected visas do not exist in the system. Please remove or select different visas",
 
         "createProjectFailed": "Create project failed",
 

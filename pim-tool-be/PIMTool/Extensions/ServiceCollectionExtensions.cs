@@ -1,4 +1,5 @@
-﻿using PIMTool.Core.Interfaces.Repositories;
+﻿using PIMTool.Controllers;
+using PIMTool.Core.Interfaces.Repositories;
 using PIMTool.Core.Interfaces.Services;
 using PIMTool.Database;
 using PIMTool.Repositories;

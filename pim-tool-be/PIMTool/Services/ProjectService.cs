@@ -19,29 +19,41 @@ namespace PIMTool.Services
 
         public async Task<Project> AddAsync(Project project)
         {
-            await _repository.AddAsync(project);
-            await _repository.SaveChangesAsync();
-            return project;
+            try
+            {
+                await _repository.AddAsync(project);
+                await _repository.SaveChangesAsync();
+                return project;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public async Task DeleteAsync(Project project)
         {
-            var projectWithEmployees = await _pimContext.Projects.Include(x=>x.ProjectEmployees).FirstOrDefaultAsync(x=>x.Id == project.Id);
+            var projectWithEmployees = await _pimContext.Projects.Include(x => x.ProjectEmployees).FirstOrDefaultAsync(x => x.Id == project.Id);
             _repository.Delete(projectWithEmployees);
             await _repository.SaveChangesAsync();
         }
 
-        public async Task<Project?> GetAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<Project> GetAsync(int id)
         {
             //var entity = await _repository.GetAsync(id, cancellationToken);
-            var entity = await _pimContext.Projects.Include(x=>x.Group.GroupLeader).FirstOrDefaultAsync(x=>x.Id == id);
+            var entity = await _pimContext.Projects.Include(x => x.Group.GroupLeader).FirstOrDefaultAsync(x => x.Id == id);
             return entity;
+        }
+
+        public async Task<Project> GetByProjectNumber(int projectNumber)
+        {
+            return await _pimContext.Projects.Include(x => x.Group.GroupLeader).FirstOrDefaultAsync(x => x.ProjectNumber == projectNumber);
         }
 
         public async Task<IEnumerable<Project>> GetProjects()
         {
             //var entities = await _repository.Get().ToListAsync();
-            var entities = await _pimContext.Projects.Include(x=>x.Group.GroupLeader).OrderByDescending(y=>y.Id).ToListAsync();
+            var entities = await _pimContext.Projects.Include(x => x.Group.GroupLeader).OrderByDescending(y => y.Id).ToListAsync();
             return entities;
         }
 
@@ -49,20 +61,21 @@ namespace PIMTool.Services
         {
             if (!string.IsNullOrEmpty(searchText) && status.HasValue)
             {
-                return await _pimContext.Projects.Include(x=>x.Group.GroupLeader)
-                    .Where(x=>
+                return await _pimContext.Projects.Include(x => x.Group.GroupLeader)
+                    .Where(x =>
                         (
-                            x.Name.ToLower().Contains(searchText.Trim().ToLower()) 
-                            || x.Customer.ToLower().Contains(searchText.Trim().ToLower()) 
+                            x.Name.ToLower().Contains(searchText.Trim().ToLower())
+                            || x.Customer.ToLower().Contains(searchText.Trim().ToLower())
                             || x.ProjectNumber.ToString().Contains(searchText.Trim().ToLower())
-                        ) 
+                        )
                         && x.Status == (Core.Domain.Enums.Status)status).ToListAsync();
-            }else if (!string.IsNullOrEmpty(searchText) && !status.HasValue)
+            }
+            else if (!string.IsNullOrEmpty(searchText) && !status.HasValue)
             {
-                  return await _pimContext.Projects.Include(x=>x.Group.GroupLeader)
-                    .Where(x=>x.Name.ToLower().Contains(searchText.Trim().ToLower()) 
-                        || x.Customer.ToLower().Contains(searchText.Trim().ToLower()) 
-                        || x.ProjectNumber.ToString().Contains(searchText.Trim().ToLower())).ToListAsync();
+                return await _pimContext.Projects.Include(x => x.Group.GroupLeader)
+                  .Where(x => x.Name.ToLower().Contains(searchText.Trim().ToLower())
+                      || x.Customer.ToLower().Contains(searchText.Trim().ToLower())
+                      || x.ProjectNumber.ToString().Contains(searchText.Trim().ToLower())).ToListAsync();
             }
             return await _pimContext.Projects.Include(x => x.Group.GroupLeader).Where(x => x.Status == (Core.Domain.Enums.Status)status).ToListAsync();
         }

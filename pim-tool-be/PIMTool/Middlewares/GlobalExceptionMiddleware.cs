@@ -1,4 +1,7 @@
-﻿namespace PIMTool.Middlewares
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
+
+namespace PIMTool.Middlewares
 {
     public class GlobalExceptionMiddleware
     {
@@ -19,15 +22,27 @@
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unexpected exception");
+                _logger.LogError(ex, ex.Message);
+
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = 500;
 
-                await context.Response.WriteAsync(new
+                //await context.Response.WriteAsync(new
+                //{
+                //    Code = 500,
+                //    Message = ex.Message
+                //}.ToString() ?? string.Empty);
+
+                ProblemDetails problemDetails = new ProblemDetails
                 {
-                    Code = 500,
-                    Message = ex.Message
-                }.ToString() ?? string.Empty);
+                    Status = 500,
+                    Type = "Server error",
+                    Title = "An internal server error has occurred",
+                    Detail = ex.Message,
+                };
+
+                var json = JsonSerializer.Serialize(problemDetails);
+                await context.Response.WriteAsync(json);
             }
         }
     }
