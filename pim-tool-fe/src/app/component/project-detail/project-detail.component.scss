@@ -12,6 +12,7 @@
   .form-container {
     padding-top: 3rem;
     padding-left: 2.5rem;
+    position: relative;
 
     .form-group {
       display: flex;
@@ -43,6 +44,13 @@
           width: 30%;
         }
       }
+    }
+
+    .member-outside-form {
+      position: absolute;
+      top: 21.5rem;
+      left: 2.5rem;
+      width: 95.5%;
     }
 
     .form-date {

@@ -12,6 +12,8 @@ import { PrimeNGConfig } from 'primeng/api';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { EmployeeService } from 'src/app/service/employee.service';
 import { ProjectMembers } from '../../model/project';
+import { formatDate } from '@angular/common';
+import { Employee } from '../../model/employee';
 interface AutoCompleteCompleteEvent {
   originalEvent: Event;
   query: string;
@@ -32,6 +34,7 @@ export class ProjectDetailComponent {
   ];
   groups: Group[] | undefined;
   updateProject!: Project;
+  updateProjectMembers!: ProjectMembers;
   actionTitle: any = 'projectDetail.create.title';
   btnSubmitContent: any = 'projectDetail.create.btnCreate';
   editMode: boolean = false;
@@ -39,10 +42,10 @@ export class ProjectDetailComponent {
   ennDateErr: string = '';
   globalErr: string = 'projectDetail.globalError';
   membersError: string = '';
-  projectSent!: Project;
+  projectSent!: ProjectMembers;
   isFailed: boolean = false;
-  empList = [];
-  selectedEmp: any;
+  empList: Employee[] = [];
+  selectedItem: Employee[] = [];
   emptyMessage: "No employees found" | undefined;
   formGroup: FormGroup | undefined;
   selectedEmployee: number[] = [];
@@ -68,10 +71,11 @@ export class ProjectDetailComponent {
       this.route.snapshot.paramMap.get('projectNumber');
     if (projectNumber) {
       this.editMode = !this.editMode;
-      this.getProjectByNumber(projectNumber);
       this.actionTitle = 'projectDetail.update.title';
       this.btnSubmitContent = 'projectDetail.update.btnUpdate';
+      this.getProjectByNumber(projectNumber);
     }
+    console.log('editMode: ', this.editMode);
   }
 
   getEmployees() {
@@ -79,7 +83,7 @@ export class ProjectDetailComponent {
       (response) => {
         this.hasEmp = true;
         this.empList = response
-        console.log("empList: ", this.empList);
+        console.log("list employees: ", this.empList);
       },
       (error: HttpErrorResponse) => {
         this.empList = []
@@ -134,9 +138,32 @@ export class ProjectDetailComponent {
 
   public getProjectByNumber(projectNumber: string): void {
     this.projectService.getProjectByNumber(parseInt(projectNumber)).subscribe(
-      (response: Project) => {
-        this.updateProject = response;
-        console.log('Current project: ', response);
+      (response: any) => {
+        this.updateProjectMembers = response;
+        this.selectedEmployee = response.listEmpId;
+        var date = new Date(response.projectDto.startDate);
+        response.projectDto.startDate = this.formatDateAfterLoadFromDb(date);
+        if (response.projectDto.endDate) {
+          date = new Date(response.projectDto.endDate);
+          response.projectDto.endDate = this.formatDateAfterLoadFromDb(date);
+        }
+        this.updateProject = response.projectDto;
+        console.log("Current project members: ", this.updateProjectMembers);
+        console.log("test proj: ", this.updateProject);
+        console.log("test mem: ", this.selectedEmployee);
+        console.log("version: ", this.updateProject.version);
+        
+        
+        // find the members from the empList that has the correct id from listEmpId and add to the selectedItem
+        response.listEmpId.forEach((e: number) => {
+          this.empList.forEach(emp => {
+            if (e == emp.id) {
+              this.selectedItem.push(emp);
+            }
+          })
+        });
+
+        console.log("selectedItem: ", this.selectedItem);
       },
       (error: HttpErrorResponse) => {
         alert(error.message);
@@ -144,11 +171,18 @@ export class ProjectDetailComponent {
     );
   }
 
+  private formatDateAfterLoadFromDb(date: any) : any {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return (`${year}-${month}-${day}`);
+  }
+
   public getGroups(): void {
     this.groupService.getGroups().subscribe(
       (response: Group[]) => {
         this.groups = response;
-        console.log(this.groups);
+        console.log("list groups: ", this.groups);
       },
       (error: HttpErrorResponse) => {
         alert(error.message);
@@ -157,7 +191,6 @@ export class ProjectDetailComponent {
   }
 
   public onAddProject(addForm: NgForm): void {
-    addForm.value.status = Status[addForm.value.status];
     console.log(addForm.value);
 
     if (addForm.invalid) {
@@ -217,6 +250,8 @@ export class ProjectDetailComponent {
   }
 
   public onUpdateProject(addForm: NgForm): void {
+    console.log("Before checking update project: ", addForm.value);
+
     if (addForm.invalid) {
       this.globalErr = 'projectDetail.globalError';
       this.numberErr = '';
@@ -224,6 +259,15 @@ export class ProjectDetailComponent {
     }
 
     const startTime = new Date(addForm.value.startDate);
+
+    const currentTime = new Date();
+    currentTime.setHours(6, 0, 0, 0);
+
+    if (startTime < currentTime) {
+      this.ennDateErr = 'projectDetail.startBeforeCurrent';
+      return;
+    }
+
     if (addForm.value.endDate != null) {
       const endTime = new Date(addForm.value.endDate);
 
@@ -233,9 +277,25 @@ export class ProjectDetailComponent {
       }
     }
 
+    if (this.empList.length == 0 && this.hasEmp == true) {
+      this.membersError = 'projectDetail.membersError';
+      return;
+    }
+
+    var ProjectMembers: ProjectMembers;
+    ProjectMembers = {
+      ProjectDto: addForm.value,
+      ListEmpId: this.selectedEmployee
+    }
+
     //set the version of current project for the project sent to BE, cuz form's values dont contain version
-    this.projectSent = addForm.value;
-    this.projectSent.version = this.updateProject.version;
+    this.projectSent = ProjectMembers;
+    console.log("before set version: ", this.projectSent.ProjectDto.version);
+    this.projectSent.ProjectDto.version = this.updateProject.version;
+    this.projectSent.ProjectDto.id = this.updateProject.id;
+    console.log("loading version: ", this.updateProject.version);
+    console.log("sending version: ", this.projectSent.ProjectDto.version);
+    
 
     console.log('Updating values: ', this.projectSent);
 
@@ -248,10 +308,9 @@ export class ProjectDetailComponent {
       },
       (error: HttpErrorResponse) => {
         console.log(error);
+        console.log(error.error.detail);
         this.isFailed = true;
-        if (
-          error.error.includes('The project has been updated by another user')
-        ) {
+        if (error.error.detail.includes('The project has been updated by another user')) {
           this.globalErr = 'projectDetail.concurrentUpdate';
         }
       }

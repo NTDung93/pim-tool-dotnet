@@ -13,7 +13,7 @@
       <div class="form-group">
         <label for="projectNumber">{{ 'projectDetail.projectNumber' | translate }} <span style="color: red">*</span></label>
         <div class="input-container">
-          <input type="text" [readonly]="editMode" [ngModel]="editMode ? updateProject.projectNumber: null"
+          <input type="text" ngModel [readonly]="editMode" [ngModel]="editMode ? updateProject.projectNumber: null"
             *ngIf="!editMode || editMode" name="projectNumber" class="form-control short-input" id="projectNumber"
             [ngClass]="{ 'red-border': numberErr !== '' }" required />
         </div>
@@ -44,7 +44,7 @@
         </div>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" style="margin-bottom: 110px;">
         <label for="groupId">{{ 'projectDetail.group' | translate }} <span style="color: red">*</span></label>
         <div class="input-container">
           <select id="groupId" name="groupId" [ngModel]="editMode ? updateProject.groupId : null"
@@ -57,48 +57,15 @@
       </div>
 
       <div class="form-group">
-        <label for="member">{{ 'projectDetail.members' | translate }} </label>
-        <div class="input-container">
-          <div style="width: 100%;">
-            <p-autoComplete [(ngModel)]="selectedEmp" [suggestions]="empList" (completeMethod)="search($event)"
-              [showEmptyMessage]="true" [emptyMessage]="emptyMessage" (onSelect)="selectEmpId($event)" [delay]="800"
-              [multiple]="true" [completeOnFocus]="true" [style]="{'display': 'block', 'width': '100%'}" [size]="20"
-              (onUnselect)="unselectEmpId($event)" [unique]="true" inputId="member">
-              <ng-template let-emp pTemplate="item">
-                <div class="flex align-items-center gap-2">
-                  <div>{{ emp.visa }}: {{emp.firstName}} {{emp.lastName}}</div>
-                </div>
-              </ng-template>
-
-              <ng-template let-val pTemplate="selectedItem">
-                <div class="flex align-items-center gap-2">
-                  <div>{{ val.visa }}: {{val.firstName}} {{val.lastName}}</div>
-                </div>
-              </ng-template>
-            </p-autoComplete>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-group" *ngIf="membersError != ''" style="margin: 0 !important; transform: translateY(-2rem)">
-        <label for="members"></label>
-        <div class="input-container">
-          <div class="form-text" style="color: red">
-            {{ membersError | translate }}
-          </div>
-        </div>
-      </div>
-
-      <div class="form-group">
         <label for="status">{{ 'projectDetail.status' | translate }} <span style="color: red">*</span></label>
         <div class="input-container">
           <select id="status" name="status" [ngModel]="editMode ? updateProject.status : null"
             *ngIf="!editMode || editMode" class="short-input" required>
             <option value="" disabled>NEW</option>
-            <option value="NEW">New</option>
-            <option value="PLA">Planned</option>
-            <option value="INP">In Progress</option>
-            <option value="FIN">Finished</option>
+            <option value=0>New</option>
+            <option value=1>Planned</option>
+            <option value=2>In Progress</option>
+            <option value=3>Finished</option>
           </select>
         </div>
       </div>
@@ -140,6 +107,39 @@
         </div>
       </div>
     </form>
+
+    <div class="form-group member-outside-form">
+      <label for="member">{{ 'projectDetail.members' | translate }} </label>
+      <div class="input-container">
+        <div style="width: 100%;">
+          <p-autoComplete [(ngModel)]="selectedItem" [suggestions]="empList" (completeMethod)="search($event)"
+            [showEmptyMessage]="true" [emptyMessage]="emptyMessage" (onSelect)="selectEmpId($event)" [delay]="800"
+            [multiple]="true" [completeOnFocus]="true" [style]="{'display': 'block', 'width': '100%'}" [size]="20"
+            (onUnselect)="unselectEmpId($event)" [unique]="true" inputId="member">
+            <ng-template let-emp pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <div>{{ emp.visa }}: {{emp.firstName}} {{emp.lastName}}</div>
+              </div>
+            </ng-template>
+    
+            <ng-template let-val pTemplate="selectedItem">
+              <div class="flex align-items-center gap-2">
+                <div>{{ val.visa }}: {{val.firstName}} {{val.lastName}}</div>
+              </div>
+            </ng-template>
+          </p-autoComplete>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group" *ngIf="membersError != ''" style="margin: 0 !important; transform: translateY(-2rem)">
+      <label for="members"></label>
+      <div class="input-container">
+        <div class="form-text" style="color: red">
+          {{ membersError | translate }}
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -151,3 +151,58 @@
 <pre>{{ detailForm.value.startDate | json }}</pre>
 <pre>{{ detailForm.value.endDate | json }}</pre>
 
+
+<!-- <div class="form-group">
+  <label for="member">{{ 'projectDetail.members' | translate }} </label>
+  <div class="input-container">
+    <div style="width: 100%;">
+      <p-autoComplete [(ngModel)]="selectedItem" [suggestions]="empList" (completeMethod)="search($event)"
+        [showEmptyMessage]="true" [emptyMessage]="emptyMessage" (onSelect)="selectEmpId($event)" [delay]="800"
+        [multiple]="true" [completeOnFocus]="true" [style]="{'display': 'block', 'width': '100%'}" [size]="20"
+        (onUnselect)="unselectEmpId($event)" [unique]="true" inputId="member">
+        <ng-template let-emp pTemplate="item">
+          <div class="flex align-items-center gap-2">
+            <div>{{ emp.visa }}: {{emp.firstName}} {{emp.lastName}}</div>
+          </div>
+        </ng-template>
+
+        <ng-template let-val pTemplate="selectedItem">
+          <div class="flex align-items-center gap-2">
+            <div>{{ val.visa }}: {{val.firstName}} {{val.lastName}}</div>
+          </div>
+        </ng-template>
+      </p-autoComplete>
+    </div>
+  </div>
+</div> -->
+
+
+
+
+
+
+
+
+<!-- <div class="form-group">
+  <label for="member">{{ 'projectDetail.members' | translate }} </label>
+  <div class="input-container">
+    <div style="width: 100%;">
+      <p-autoComplete [(ngModel)]="selectedItem" [suggestions]="empList" (completeMethod)="search($event)"
+        [showEmptyMessage]="true" [emptyMessage]="emptyMessage" (onSelect)="selectEmpId($event)" [delay]="800"
+        [multiple]="true" [completeOnFocus]="true" [style]="{'display': 'block', 'width': '100%'}" [size]="20"
+        (onUnselect)="unselectEmpId($event)" [unique]="true" inputId="member">
+        <ng-template let-emp pTemplate="item">
+          <div class="flex align-items-center gap-2">
+            <div>{{ emp.visa }}: {{emp.firstName}} {{emp.lastName}}</div>
+          </div>
+        </ng-template>
+
+        <ng-template let-val pTemplate="selectedItem">
+          <div class="flex align-items-center gap-2">
+            <div>{{ val.visa }}: {{val.firstName}} {{val.lastName}}</div>
+          </div>
+        </ng-template>
+      </p-autoComplete>
+    </div>
+  </div>
+</div> -->

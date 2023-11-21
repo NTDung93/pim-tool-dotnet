@@ -38,11 +38,16 @@ namespace PIMTool.Services
             await _repository.SaveChangesAsync();
         }
 
-        public async Task<Project?> GetAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<Project> GetAsync(int id)
         {
             //var entity = await _repository.GetAsync(id, cancellationToken);
             var entity = await _pimContext.Projects.Include(x => x.Group.GroupLeader).FirstOrDefaultAsync(x => x.Id == id);
             return entity;
+        }
+
+        public async Task<Project> GetByProjectNumber(int projectNumber)
+        {
+            return await _pimContext.Projects.Include(x => x.Group.GroupLeader).FirstOrDefaultAsync(x => x.ProjectNumber == projectNumber);
         }
 
         public async Task<IEnumerable<Project>> GetProjects()

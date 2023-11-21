@@ -37,6 +37,11 @@ namespace PIMTool.Services
            return await _context.ProjectEmployees.ToListAsync();
         }
 
+        public async Task<int[]> GetProjectMembers(int id)
+        {
+            return await _context.ProjectEmployees.Where(x => x.ProjectId == id).Select(x => x.EmployeeId).ToArrayAsync();
+        }
+
         public async Task UpdateAsync()
         {
             await _context.SaveChangesAsync();
