@@ -83,6 +83,16 @@
             "btnUpdate": "Sauvegarder les modifications"
 
         },
+
+        "please": "S'il te plaît",
+
+        "or": "ou",
+
+        "contactAdmin": "contactez votre administrateur",
+
+        "back": "retour à la recherche de projet",
+
+        "serverError": "Une erreur inattendue s'est produite.",
         
         "globalError": "Veuillez saisir tous les champs obligatoires (*)",
 

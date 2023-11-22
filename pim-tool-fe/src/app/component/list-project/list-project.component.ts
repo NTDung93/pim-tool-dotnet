@@ -49,7 +49,7 @@ export class ListProjectComponent implements OnInit {
     private router: Router,
     private sharedService: SharedService,
     private _toastService: ToastService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.savedSearchText = this.sharedService.getSavedSearchText();
@@ -76,7 +76,8 @@ export class ListProjectComponent implements OnInit {
         this.projects.sort((a, b) => a.projectNumber - b.projectNumber);
       },
       (error: HttpErrorResponse) => {
-        alert(error.message);
+        console.log("error get projects: ", error);
+        this.navigateToErrorPage();
       }
     );
   }
@@ -98,7 +99,8 @@ export class ListProjectComponent implements OnInit {
           this.projects = response;
         },
         (error: HttpErrorResponse) => {
-          alert(error.message);
+          console.log("error search projects: ", error);
+          this.navigateToErrorPage();
         }
       );
   }
@@ -123,8 +125,9 @@ export class ListProjectComponent implements OnInit {
           console.log(error);
           if (error.status == 404) {
             this._toastService.info('Project not found');
-          }else{
-            this._toastService.error(error.message);
+          } else {
+            console.log("error search projects: ", error);
+            this.navigateToErrorPage();
           }
         }
       );
@@ -150,7 +153,8 @@ export class ListProjectComponent implements OnInit {
         this.getProjects();
       },
       (error: HttpErrorResponse) => {
-        alert(error.message);
+        console.log("error delete single projects: ", error);
+        this.navigateToErrorPage();
       }
     );
 
@@ -166,7 +170,8 @@ export class ListProjectComponent implements OnInit {
         },
         (error: HttpErrorResponse) => {
           console.log(project.id);
-          alert(error.message);
+          console.log("error delete multiple projects: ", error);
+          this.navigateToErrorPage();
         }
       );
     });
@@ -197,6 +202,10 @@ export class ListProjectComponent implements OnInit {
     this.router.navigate(['/project', project.projectNumber]);
   }
 
+  navigateToErrorPage() {
+    this.router.navigate(['/error']);
+  }
+
   changeIsUpdate(val: boolean) {
     this.sharedService.setIsUpdate(val);
   }
@@ -205,7 +214,7 @@ export class ListProjectComponent implements OnInit {
     return this.sharedService.formatDate(date);
   }
 
-  public setSavedValue (searchText: any, status: any) {
+  public setSavedValue(searchText: any, status: any) {
     this.sharedService.setSavedSearchText(searchText);
     this.sharedService.setSavedSatus(status);
     this.savedStatus = this.sharedService.getSavedSatus();

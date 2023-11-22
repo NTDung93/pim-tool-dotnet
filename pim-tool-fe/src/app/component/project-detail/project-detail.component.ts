@@ -88,6 +88,8 @@ export class ProjectDetailComponent {
       (error: HttpErrorResponse) => {
         this.empList = []
         this.hasEmp = false;
+        console.log("error get employees: ", error);
+        this.navigateToErrorPage();
       }
     )
   }
@@ -99,6 +101,8 @@ export class ProjectDetailComponent {
       },
       (error: HttpErrorResponse) => {
         this.empList = []
+        console.log("error search for members: ", error);
+        this.navigateToErrorPage();
       }
     )
   }
@@ -152,8 +156,7 @@ export class ProjectDetailComponent {
         console.log("test proj: ", this.updateProject);
         console.log("test mem: ", this.selectedEmployee);
         console.log("version: ", this.updateProject.version);
-        
-        
+
         // find the members from the empList that has the correct id from listEmpId and add to the selectedItem
         response.listEmpId.forEach((e: number) => {
           this.empList.forEach(emp => {
@@ -166,12 +169,13 @@ export class ProjectDetailComponent {
         console.log("selectedItem: ", this.selectedItem);
       },
       (error: HttpErrorResponse) => {
-        alert(error.message);
+        console.log("error get project by project number: ", error);
+        this.navigateToErrorPage();
       }
     );
   }
 
-  private formatDateAfterLoadFromDb(date: any) : any {
+  private formatDateAfterLoadFromDb(date: any): any {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
@@ -185,7 +189,8 @@ export class ProjectDetailComponent {
         console.log("list groups: ", this.groups);
       },
       (error: HttpErrorResponse) => {
-        alert(error.message);
+        console.log("error get groups: ", error);
+        this.navigateToErrorPage();
       }
     );
   }
@@ -240,11 +245,17 @@ export class ProjectDetailComponent {
       (error: HttpErrorResponse) => {
         console.log(error);
         console.log(error.error.detail);
+        console.log("status text", error.statusText);
+
         if (error.error.detail.includes('project number already existed')) {
           this.numberErr = 'projectDetail.numberExist';
+          this.isFailed = true;
+          this.globalErr = 'projectDetail.createProjectFailed';
+          return;
         }
-        this.isFailed = true;
-        this.globalErr = 'projectDetail.createProjectFailed';
+
+        console.log("error add project: ", error);
+        this.navigateToErrorPage();
       }
     );
   }
@@ -295,7 +306,7 @@ export class ProjectDetailComponent {
     this.projectSent.ProjectDto.id = this.updateProject.id;
     console.log("loading version: ", this.updateProject.version);
     console.log("sending version: ", this.projectSent.ProjectDto.version);
-    
+
 
     console.log('Updating values: ', this.projectSent);
 
@@ -309,10 +320,16 @@ export class ProjectDetailComponent {
       (error: HttpErrorResponse) => {
         console.log(error);
         console.log(error.error.detail);
+        console.log("status text", error.statusText);
+
         this.isFailed = true;
         if (error.error.detail.includes('The project has been updated by another user')) {
           this.globalErr = 'projectDetail.concurrentUpdate';
+          return;
         }
+
+        console.log("error update project: ", error);
+        this.navigateToErrorPage();
       }
     );
   }
@@ -323,5 +340,9 @@ export class ProjectDetailComponent {
 
   public navigateToList() {
     this.router.navigateByUrl('/list');
+  }
+
+  navigateToErrorPage() {
+    this.router.navigate(['/error']);
   }
 }

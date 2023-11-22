@@ -86,6 +86,16 @@
 
         },
 
+        "please": "Please",
+
+        "or": "or",
+
+        "contactAdmin": "contact your administrator",
+        
+        "back": "back to search project",
+
+        "serverError": "Unexpected error occurred.",
+
         "globalError": "Please enter all the mandatory fields (*)",
 
         "startBeforeCurrent": "Start date must be the same or after current date",
