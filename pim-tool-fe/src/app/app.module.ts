@@ -15,8 +15,9 @@ import { AngularToastifyModule, ToastService } from 'angular-toastify';
 import { AutoCompleteModule} from 'primeng/autocomplete';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
+import { ServerErrorComponent } from './component/server-error/server-error.component';
 @NgModule({
-  declarations: [AppComponent, ListProjectComponent, ProjectDetailComponent, StatusPipe],
+  declarations: [AppComponent, ListProjectComponent, ProjectDetailComponent, StatusPipe, ServerErrorComponent],
   imports: [
     BrowserModule,
     FormsModule,

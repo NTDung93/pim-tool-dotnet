@@ -143,66 +143,10 @@
   </div>
 </div>
 
-<pre>{{ detailForm.value.projectNumber | json }}</pre>
+<!-- <pre>{{ detailForm.value.projectNumber | json }}</pre>
 <pre>{{ detailForm.value.name | json }}</pre>
 <pre>{{ detailForm.value.customer | json }}</pre>
 <pre>{{ detailForm.value.groupId | json }}</pre>
 <pre>{{ detailForm.value.status | json }}</pre>
 <pre>{{ detailForm.value.startDate | json }}</pre>
-<pre>{{ detailForm.value.endDate | json }}</pre>
-
-
-<!-- <div class="form-group">
-  <label for="member">{{ 'projectDetail.members' | translate }} </label>
-  <div class="input-container">
-    <div style="width: 100%;">
-      <p-autoComplete [(ngModel)]="selectedItem" [suggestions]="empList" (completeMethod)="search($event)"
-        [showEmptyMessage]="true" [emptyMessage]="emptyMessage" (onSelect)="selectEmpId($event)" [delay]="800"
-        [multiple]="true" [completeOnFocus]="true" [style]="{'display': 'block', 'width': '100%'}" [size]="20"
-        (onUnselect)="unselectEmpId($event)" [unique]="true" inputId="member">
-        <ng-template let-emp pTemplate="item">
-          <div class="flex align-items-center gap-2">
-            <div>{{ emp.visa }}: {{emp.firstName}} {{emp.lastName}}</div>
-          </div>
-        </ng-template>
-
-        <ng-template let-val pTemplate="selectedItem">
-          <div class="flex align-items-center gap-2">
-            <div>{{ val.visa }}: {{val.firstName}} {{val.lastName}}</div>
-          </div>
-        </ng-template>
-      </p-autoComplete>
-    </div>
-  </div>
-</div> -->
-
-
-
-
-
-
-
-
-<!-- <div class="form-group">
-  <label for="member">{{ 'projectDetail.members' | translate }} </label>
-  <div class="input-container">
-    <div style="width: 100%;">
-      <p-autoComplete [(ngModel)]="selectedItem" [suggestions]="empList" (completeMethod)="search($event)"
-        [showEmptyMessage]="true" [emptyMessage]="emptyMessage" (onSelect)="selectEmpId($event)" [delay]="800"
-        [multiple]="true" [completeOnFocus]="true" [style]="{'display': 'block', 'width': '100%'}" [size]="20"
-        (onUnselect)="unselectEmpId($event)" [unique]="true" inputId="member">
-        <ng-template let-emp pTemplate="item">
-          <div class="flex align-items-center gap-2">
-            <div>{{ emp.visa }}: {{emp.firstName}} {{emp.lastName}}</div>
-          </div>
-        </ng-template>
-
-        <ng-template let-val pTemplate="selectedItem">
-          <div class="flex align-items-center gap-2">
-            <div>{{ val.visa }}: {{val.firstName}} {{val.lastName}}</div>
-          </div>
-        </ng-template>
-      </p-autoComplete>
-    </div>
-  </div>
-</div> -->
+<pre>{{ detailForm.value.endDate | json }}</pre> -->
