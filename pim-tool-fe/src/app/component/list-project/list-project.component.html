@@ -3,14 +3,14 @@
   <p class="area-title">{{ "projectList.projectList" | translate}}</p>
   <form #searchForm="ngForm" (ngSubmit)="searchProjects(searchForm)">
     <div class="search-area">
-      <input type="text" ngModel [placeholder]="
+      <input type="text" [ngModel]="savedSearchText" [placeholder]="
           savedSearchText != undefined && savedSearchText != null && savedSearchText != ''
             ? savedSearchText
             : 'projectList.search.name' | translate
         " name="searchText" />
-      <select ngModel name="status" class="short-input">
+      <select [ngModel]="savedStatus" name="status" class="short-input">
         <option value="" selected disabled>
-          {{ savedStatus != undefined && savedStatus != null && savedStatus != '' ? savedStatus : 'projectList.search.status' | translate }}
+          {{ (savedStatus != undefined && savedStatus != null && savedStatus != '' && savedStatus) ? savedStatus : 'projectList.search.status' | translate }}
         </option>
         <option value=0>NEW</option>
         <option value=1>PLA</option>
