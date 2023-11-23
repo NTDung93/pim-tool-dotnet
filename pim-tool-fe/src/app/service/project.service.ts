@@ -41,4 +41,12 @@ export class ProjectService {
   public updateProject(ProjectMembers: ProjectMembers): Observable<Project> {
     return this.http.put<Project>(`${this.projectUrl}?id=${ProjectMembers.ProjectDto.id}`, ProjectMembers);
   }
+
+  public getProjectsPagination(limit: number, skip: number): Observable<Project[]> {
+    return this.http.get<Project[]>(`${this.projectUrl}/pagination?limit=${limit}&skip=${skip}`);
+  }
+
+  public getProjectsCount(): Observable<number> {
+    return this.http.get<number>(`${this.projectUrl}/count`);
+  }
 }

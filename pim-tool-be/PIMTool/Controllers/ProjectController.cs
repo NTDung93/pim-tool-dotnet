@@ -100,7 +100,8 @@ namespace PIMTool.Controllers
             {
                 return BadRequest(ModelState);
             }
-            return base.CreatedAtRoute("GetProjects", _mapper.Map<IEnumerable<ProjectDto>>(listProjects));
+            var listProjectsAfter = await _projectService.GetProjects();
+            return base.CreatedAtRoute("GetProjects", _mapper.Map<IEnumerable<ProjectDto>>(listProjectsAfter));
         }
 
         [HttpPut]
@@ -232,6 +233,38 @@ namespace PIMTool.Controllers
                 ListEmpId = projectMembers
             };
             return Ok(projectMembersDto);
+        }
+
+        //pagination with skip and limit per page
+        [HttpGet("pagination")]
+        public async Task<ActionResult<IEnumerable<ProjectDto>>> GetProjectsPagination([FromQuery] int limit, [FromQuery] int skip)
+        {
+            var entities = await _projectService.GetProjectsPagination(skip, limit);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (!entities.Any())
+            {
+                return NotFound();
+            }
+            return Ok(_mapper.Map<IEnumerable<ProjectDto>>(entities));
+        }
+
+        //count projects in database
+        [HttpGet("count")]
+        public async Task<ActionResult<int>> CountProjects()
+        {
+            var entities = await _projectService.GetProjects();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (!entities.Any())
+            {
+                return NotFound();
+            }
+            return Ok(entities.Count());
         }
     }
 }

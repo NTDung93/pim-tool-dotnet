@@ -8,6 +8,7 @@ export class SharedService {
   private savedSearchText!: String;
   private savedSatus!: String;
   private isUpdate: boolean = false;
+  private page!: number;
 
   constructor(private datePipe: DatePipe) {}
 
@@ -37,5 +38,13 @@ export class SharedService {
 
   formatDate(date: Date): string | null {
     return this.datePipe.transform(date, 'dd.MM.yyyy');
+  }
+
+  setPage(value: number) {
+    this.page = value;
+  }
+
+  getPage(): number {
+    return this.page;
   }
 }

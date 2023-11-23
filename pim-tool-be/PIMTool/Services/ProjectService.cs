@@ -57,6 +57,17 @@ namespace PIMTool.Services
             return entities;
         }
 
+        public async Task<IEnumerable<Project>> GetProjectsPagination(int skip, int limit)
+        {
+            var entities = await _pimContext.Projects
+                            .Include(x => x.Group.GroupLeader)
+                            .OrderBy(y => y.ProjectNumber)
+                            .Skip(skip)
+                            .Take(limit)
+                            .ToListAsync();
+            return entities;
+        }
+
         public async Task<IEnumerable<Project>> Search(string? searchText, int? status)
         {
             if (!string.IsNullOrEmpty(searchText) && status.HasValue)

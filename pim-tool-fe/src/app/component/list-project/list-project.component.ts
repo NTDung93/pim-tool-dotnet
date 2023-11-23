@@ -43,6 +43,9 @@ export class ListProjectComponent implements OnInit {
 
   selectedItems: Project[] = [];
   page = 1;
+  projectsCount: number = 0;
+  pageQuantity: number = 0;
+  pagesArray: number[] = [];
 
   constructor(
     private projectService: ProjectService,
@@ -52,6 +55,12 @@ export class ListProjectComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.page = this.sharedService.getPage();
+    if (this.page == undefined) {
+      this.page = 1;
+      this.sharedService.setPage(this.page);
+    }
+    console.log("current page: ", this.sharedService.getPage());
     this.savedSearchText = this.sharedService.getSavedSearchText();
     this.savedStatus = this.sharedService.getSavedSatus();
     if (this.savedSearchText == '' && this.savedStatus == '') {
@@ -63,8 +72,56 @@ export class ListProjectComponent implements OnInit {
       console.log(this.savedStatus);
       this.searchProjects2(this.savedSearchText, this.savedStatus);
     } else {
-      this.getProjects();
+      this.getProjectsCount();
+      console.log("projects count: ", this.projectsCount);
+      this.loadProjectsPagination(10, (this.page - 1) * 10);
     }
+  }
+
+  public switchPage(page: number): void {
+    this.sharedService.setPage(page);
+    this.page = this.sharedService.getPage();
+    console.log("page: ", this.sharedService.getPage());
+    this.loadProjectsPagination(10, (page - 1) * 10);
+  }
+
+  public switchPagePrevious(): void {
+    if (this.sharedService.getPage() == 1) {
+      return;
+    }
+    this.sharedService.setPage(this.sharedService.getPage() - 1);
+    this.page = this.sharedService.getPage();
+    console.log("page: ", this.sharedService.getPage());
+    this.loadProjectsPagination(10, (this.sharedService.getPage() - 1) * 10);
+  }
+
+  public switchPageNext(): void {
+    if (this.sharedService.getPage() == this.pageQuantity) {
+      return;
+    }
+    this.sharedService.setPage(this.sharedService.getPage() + 1);
+    this.page = this.sharedService.getPage();
+    console.log("page: ", this.sharedService.getPage());
+    this.loadProjectsPagination(10, (this.sharedService.getPage() - 1) * 10);
+  }
+
+  public getProjectsCount(): void {
+    this.projectService.getProjectsCount().subscribe(
+      (response: number) => {
+        console.log("count: ", response);
+        this.projectsCount = response;
+        this.pageQuantity = Math.ceil(this.projectsCount / 10);
+        this.pagesArray = this.generatePageNumbers(this.pageQuantity);
+      },
+      (error: HttpErrorResponse) => {
+        console.log("error get projects count: ", error);
+        this.navigateToErrorPage();
+      }
+    );
+  }
+
+  generatePageNumbers(pageQuantity: number): number[] {
+    return Array.from({ length: pageQuantity }, (_, index) => index + 1);
   }
 
   public getProjects(): void {
@@ -77,6 +134,21 @@ export class ListProjectComponent implements OnInit {
       },
       (error: HttpErrorResponse) => {
         console.log("error get projects: ", error);
+        this.navigateToErrorPage();
+      }
+    );
+  }
+
+  public loadProjectsPagination(limit: number, skip: number): void {
+    this.projectService.getProjectsPagination(limit, skip).subscribe(
+      (response: Project[]) => {
+        console.log("pagi projects: ", response);
+
+        this.projects = response;
+        this.projects.sort((a, b) => a.projectNumber - b.projectNumber);
+      },
+      (error: HttpErrorResponse) => {
+        console.log("error get projects pagination: ", error);
         this.navigateToErrorPage();
       }
     );
@@ -139,7 +211,7 @@ export class ListProjectComponent implements OnInit {
       searchText: '',
       status: '',
     });
-    this.getProjects();
+    this.loadProjectsPagination(10, 0);
   }
 
   public setProjectIdDelete(projectId: number) {
@@ -150,7 +222,8 @@ export class ListProjectComponent implements OnInit {
     this.projectService.deleteProject(projectId).subscribe(
       (response: void) => {
         console.log(response);
-        this.getProjects();
+        this.getProjectsCount();
+        this.loadProjectsPagination(10, 0);
       },
       (error: HttpErrorResponse) => {
         console.log("error delete single projects: ", error);
@@ -166,7 +239,8 @@ export class ListProjectComponent implements OnInit {
       this.projectService.deleteProject(project.id).subscribe(
         (response: void) => {
           console.log(response);
-          this.getProjects();
+          this.getProjectsCount();
+          this.loadProjectsPagination(10, 0);
         },
         (error: HttpErrorResponse) => {
           console.log(project.id);
