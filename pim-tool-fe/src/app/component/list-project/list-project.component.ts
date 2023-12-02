@@ -69,6 +69,7 @@ export class ListProjectComponent implements OnInit {
     }
     console.log("current page: ", this.sharedService.getPage());
     
+    this.getProjectsCount();
     
     if (this.savedSearchText == '' && this.savedStatus == '') {
       this.loadProjectsPagination(10, (this.page - 1) * 10);
@@ -79,7 +80,6 @@ export class ListProjectComponent implements OnInit {
       console.log(this.savedStatus);
       this.searchProjects2(this.savedSearchText, this.savedStatus);
     } else {
-      this.getProjectsCount();
       console.log("projects count: ", this.projectsCount);
       this.loadProjectsPagination(10, (this.page - 1) * 10);
     }
