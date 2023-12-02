@@ -55,16 +55,24 @@ export class ListProjectComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.page = this.sharedService.getPage();
+    console.log("savedStatus1: ",this.savedStatus);
+    
+    this.savedSearchText = this.sharedService.getSavedSearchText();
+    this.savedStatus = this.sharedService.getSavedSatus();
+    
+    console.log("savedSearchText: ", this.savedSearchText);
+    console.log("savedStatus: ",this.savedStatus);
+    
     if (this.page == undefined) {
       this.page = 1;
       this.sharedService.setPage(this.page);
     }
     console.log("current page: ", this.sharedService.getPage());
-    this.savedSearchText = this.sharedService.getSavedSearchText();
-    this.savedStatus = this.sharedService.getSavedSatus();
+    
+    this.getProjectsCount();
+    
     if (this.savedSearchText == '' && this.savedStatus == '') {
-      this.getProjects();
+      this.loadProjectsPagination(10, (this.page - 1) * 10);
     }
 
     if (this.savedSearchText != undefined || this.savedStatus != undefined) {
@@ -72,7 +80,6 @@ export class ListProjectComponent implements OnInit {
       console.log(this.savedStatus);
       this.searchProjects2(this.savedSearchText, this.savedStatus);
     } else {
-      this.getProjectsCount();
       console.log("projects count: ", this.projectsCount);
       this.loadProjectsPagination(10, (this.page - 1) * 10);
     }
@@ -83,6 +90,7 @@ export class ListProjectComponent implements OnInit {
     this.page = this.sharedService.getPage();
     console.log("page: ", this.sharedService.getPage());
     this.loadProjectsPagination(10, (page - 1) * 10);
+    this.setSavedValue('', '');
   }
 
   public switchPagePrevious(): void {
@@ -155,15 +163,13 @@ export class ListProjectComponent implements OnInit {
   }
 
   public searchProjects2(searchText: any, status: any) {
-    if (searchText == '' && status == '') {
+    if ((searchText == '' && status == '') || (searchText == null && status == null)) {
+      this.loadProjectsPagination(10, (this.sharedService.getPage() - 1) * 10);
       return;
     }
 
-    this.projectService
-      .searchProjects(
-        searchText == '' ? null : searchText,
-        status == '' ? null : status
-      )
+      this.projectService
+      .searchProjects(searchText ? searchText : '', status ? status : '')
       .subscribe(
         (response: Project[]) => {
           console.log('day la search');
@@ -171,15 +177,20 @@ export class ListProjectComponent implements OnInit {
           this.projects = response;
         },
         (error: HttpErrorResponse) => {
-          console.log("error search projects: ", error);
-          this.navigateToErrorPage();
+          console.log(error);
+          if (error.status == 404) {
+            this._toastService.info('Project not found');
+          } else {
+            console.log("error search projects: ", error);
+            this.navigateToErrorPage();
+          }
         }
       );
   }
 
   public searchProjects(searchForm: NgForm): void {
-    if ((searchForm.value.searchText == '' && searchForm.value.status == '') || (searchForm.value.searchText == null && searchForm.value.status == null)) {
-      this.getProjects();
+    if ((searchForm.value.searchText == '' && searchForm.value.status == '') || (searchForm.value.searchText == null && searchForm.value.status == null) || (searchForm.value.searchText == undefined && searchForm.value.status == undefined)) {
+      this.loadProjectsPagination(10, (this.page - 1) * 10);
       return;
     }
 
@@ -211,6 +222,8 @@ export class ListProjectComponent implements OnInit {
       searchText: '',
       status: '',
     });
+    this.page = 1;
+    this.sharedService.setPage(1);
     this.loadProjectsPagination(10, 0);
   }
 

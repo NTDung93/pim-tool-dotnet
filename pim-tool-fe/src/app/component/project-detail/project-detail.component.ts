@@ -14,10 +14,6 @@ import { EmployeeService } from 'src/app/service/employee.service';
 import { ProjectMembers } from '../../model/project';
 import { formatDate } from '@angular/common';
 import { Employee } from '../../model/employee';
-interface AutoCompleteCompleteEvent {
-  originalEvent: Event;
-  query: string;
-}
 
 @Component({
   selector: 'app-project-detail',
