@@ -11,7 +11,7 @@
     <form #detailForm="ngForm" (ngSubmit)="editMode ? onUpdateProject(detailForm) : onAddProject(detailForm)">
 
       <div class="form-group">
-        <label for="projectNumber">{{ 'projectDetail.projectNumber' | translate }} <span style="color: red">*</span></label>
+        <label for="projectNumber">{{ 'projectDetail.projectNumber' | translate }} <span class="required">*</span></label>
         <div class="input-container">
           <input type="text" ngModel [readonly]="editMode" [ngModel]="editMode ? updateProject.projectNumber: null"
             *ngIf="!editMode || editMode" name="projectNumber" class="form-control short-input" id="projectNumber"
@@ -22,14 +22,14 @@
       <div class="form-group" *ngIf="numberErr != ''" style="margin: 0 !important; transform: translateY(-2rem)">
         <label for="number"></label>
         <div class="input-container">
-          <div class="form-text" style="color: red">
+          <div class="form-text" class="required">
             {{ numberErr | translate }}
           </div>
         </div>
       </div>
 
       <div class="form-group">
-        <label for="name">{{ 'projectDetail.projectName' | translate }} <span style="color: red">*</span></label>
+        <label for="name">{{ 'projectDetail.projectName' | translate }} <span class="required">*</span></label>
         <div class="input-container">
           <input type="text" [ngModel]="editMode ? updateProject.name : null" *ngIf="!editMode || editMode" name="name"
             class="form-control" id="name" required />
@@ -37,15 +37,15 @@
       </div>
 
       <div class="form-group">
-        <label for="customer">{{ 'projectDetail.customer' | translate }} <span style="color: red">*</span></label>
+        <label for="customer">{{ 'projectDetail.customer' | translate }} <span class="required">*</span></label>
         <div class="input-container">
           <input type="text" [ngModel]="editMode ? updateProject.customer : null" *ngIf="!editMode || editMode"
             name="customer" class="form-control" id="customer" required />
         </div>
       </div>
 
-      <div class="form-group" style="margin-bottom: 110px;">
-        <label for="groupId">{{ 'projectDetail.group' | translate }} <span style="color: red">*</span></label>
+      <div class="form-group group-input">
+        <label for="groupId">{{ 'projectDetail.group' | translate }} <span class="required">*</span></label>
         <div class="input-container">
           <select id="groupId" name="groupId" [ngModel]="editMode ? updateProject.groupId : null"
             *ngIf="!editMode || editMode" class="short-input" required>
@@ -57,7 +57,7 @@
       </div>
 
       <div class="form-group">
-        <label for="status">{{ 'projectDetail.status' | translate }} <span style="color: red">*</span></label>
+        <label for="status">{{ 'projectDetail.status' | translate }} <span class="required">*</span></label>
         <div class="input-container">
           <select id="status" name="status" [ngModel]="editMode ? updateProject.status : null"
             *ngIf="!editMode || editMode" class="short-input" required>
@@ -72,7 +72,7 @@
 
       <div class="form-date">
         <div class="form-group form-date__start">
-          <label for="startDate">{{ 'projectDetail.startDate' | translate }} <span style="color: red">*</span></label>
+          <label for="startDate">{{ 'projectDetail.startDate' | translate }} <span class="required">*</span></label>
           <div class="input-container">
             <input type="date" [ngModel]="editMode ? updateProject.startDate : null" *ngIf="!editMode || editMode"
               name="startDate" class="form-control short-input" id="startDate"
@@ -91,7 +91,7 @@
       </div>
 
       <div style="margin: 0 !important; display: flex; justify-content: flex-end" *ngIf="ennDateErr != ''">
-        <div class="form-text" style="color: red; transform: translateY(-2rem)">
+        <div class="form-text err-date">
           {{ ennDateErr | translate}}
         </div>
       </div>
@@ -135,7 +135,7 @@
     <div class="form-group" *ngIf="membersError != ''" style="margin: 0 !important; transform: translateY(-2rem)">
       <label for="members"></label>
       <div class="input-container">
-        <div class="form-text" style="color: red">
+        <div class="form-text" class="required">
           {{ membersError | translate }}
         </div>
       </div>
