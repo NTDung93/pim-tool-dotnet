@@ -55,24 +55,20 @@ export class ListProjectComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log("savedStatus1: ",this.savedStatus);
-    
     this.savedSearchText = this.sharedService.getSavedSearchText();
     this.savedStatus = this.sharedService.getSavedSatus();
     
-    console.log("savedSearchText: ", this.savedSearchText);
-    console.log("savedStatus: ",this.savedStatus);
-    
-    if (this.page == undefined) {
+    if (this.sharedService.getPage() == undefined) {
       this.page = 1;
-      this.sharedService.setPage(this.page);
+      this.sharedService.setPage(1);
+    }else{
+      this.page = this.sharedService.getPage();
     }
     console.log("current page: ", this.sharedService.getPage());
     
     this.getProjectsCount();
-    
     if (this.savedSearchText == '' && this.savedStatus == '') {
-      this.loadProjectsPagination(10, (this.page - 1) * 10);
+      this.switchPage(this.page);
     }
 
     if (this.savedSearchText != undefined || this.savedStatus != undefined) {
@@ -81,7 +77,7 @@ export class ListProjectComponent implements OnInit {
       this.searchProjects2(this.savedSearchText, this.savedStatus);
     } else {
       console.log("projects count: ", this.projectsCount);
-      this.loadProjectsPagination(10, (this.page - 1) * 10);
+      this.switchPage(this.page);
     }
   }
 
@@ -236,7 +232,7 @@ export class ListProjectComponent implements OnInit {
       (response: void) => {
         console.log(response);
         this.getProjectsCount();
-        this.loadProjectsPagination(10, 0);
+        this.switchPage(this.page);
       },
       (error: HttpErrorResponse) => {
         console.log("error delete single projects: ", error);

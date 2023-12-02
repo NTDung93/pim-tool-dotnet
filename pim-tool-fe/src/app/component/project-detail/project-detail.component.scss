@@ -14,6 +14,10 @@
     padding-left: 2.5rem;
     position: relative;
 
+    .required {
+      color: red;
+    } 
+
     .form-group {
       display: flex;
       align-items: center;
@@ -46,12 +50,21 @@
       }
     }
 
+    .group-input{
+      margin-bottom: 6.7rem;
+    }
+
     .member-outside-form {
       position: absolute;
       top: 21.5rem;
       left: 2.5rem;
       width: 95.5%;
     }
+
+    .err-date {
+      color: red; 
+      transform: translateY(-2rem)
+    } 
 
     .form-date {
       display: flex;
