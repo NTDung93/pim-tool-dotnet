@@ -32,7 +32,6 @@
 
       .input-container {
         display: flex;
-        // justify-content: flex-start;
         flex: 1;
         input {
           height: 30px;
@@ -52,13 +51,15 @@
 
     .group-input{
       margin-bottom: 6.7rem;
+      // margin-bottom: 110px;
     }
 
     .member-outside-form {
       position: absolute;
       top: 21.5rem;
       left: 2.5rem;
-      width: 95.5%;
+      // width: 95.5%;
+      width: 97.2%;
     }
 
     .err-date {
