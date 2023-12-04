@@ -11,7 +11,8 @@
     <form #detailForm="ngForm" (ngSubmit)="editMode ? onUpdateProject(detailForm) : onAddProject(detailForm)">
 
       <div class="form-group">
-        <label for="projectNumber">{{ 'projectDetail.projectNumber' | translate }} <span class="required">*</span></label>
+        <label for="projectNumber">{{ 'projectDetail.projectNumber' | translate }} <span
+            class="required">*</span></label>
         <div class="input-container">
           <input type="text" ngModel [readonly]="editMode" [ngModel]="editMode ? updateProject.projectNumber: null"
             *ngIf="!editMode || editMode" name="projectNumber" class="form-control short-input" id="projectNumber"
@@ -108,7 +109,7 @@
       </div>
     </form>
 
-    <div class="form-group member-outside-form">
+    <div class="form-group member-outside-form" [ngClass]="{ 'member-outside-form-err': numberErr !== '' }">
       <label for="member">{{ 'projectDetail.members' | translate }} </label>
       <div class="input-container">
         <div style="width: 100%;">
@@ -121,7 +122,7 @@
                 <div>{{ emp.visa }}: {{emp.firstName}} {{emp.lastName}}</div>
               </div>
             </ng-template>
-    
+
             <ng-template let-val pTemplate="selectedItem">
               <div class="flex align-items-center gap-2">
                 <div>{{ val.visa }}: {{val.firstName}} {{val.lastName}}</div>
@@ -132,7 +133,8 @@
       </div>
     </div>
 
-    <div class="form-group" *ngIf="membersError != ''" style="margin: 0 !important; transform: translateY(-2rem)">
+    <div class="form-group member-err" *ngIf="membersError != ''"
+      style="margin: 0 !important; transform: translateY(-2rem)">
       <label for="members"></label>
       <div class="input-container">
         <div class="form-text" class="required">
