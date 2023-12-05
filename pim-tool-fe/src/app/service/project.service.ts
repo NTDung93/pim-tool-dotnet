@@ -28,6 +28,17 @@ export class ProjectService {
     );
   }
 
+  public searchProjectsWithPagination(
+    searchText: String,
+    status: number,
+    limit: number,
+    skip: number
+  ): Observable<Project[]> {
+    return this.http.get<Project[]>(
+      `${this.projectUrl}/search-with-pagination?searchText=${searchText}&status=${status}&limit=${limit}&skip=${skip}`
+    );
+  }
+
   public deleteProject(projectId: number): Observable<void> {
     return this.http.delete<void>(
       `${this.projectUrl}?id=${projectId}`

@@ -40,12 +40,12 @@ export class ListProjectComponent implements OnInit {
   projectsArr: Project[] = []; // Your projects array
   savedSearchText: any;
   savedStatus: String = '';
-
   selectedItems: Project[] = [];
   page = 1;
   projectsCount: number = 0;
   pageQuantity: number = 0;
   pagesArray: number[] = [];
+  searchMode: boolean = false;
 
   constructor(
     private projectService: ProjectService,
@@ -64,19 +64,21 @@ export class ListProjectComponent implements OnInit {
     }else{
       this.page = this.sharedService.getPage();
     }
-    console.log("current page: ", this.sharedService.getPage());
     
-    this.getProjectsCount();
-    if (this.savedSearchText == '' && this.savedStatus == '') {
-      this.switchPage(this.page);
-    }
+    console.log("current page: ", this.sharedService.getPage());
+    console.log("saved search text: ", this.savedSearchText);
+    console.log("saved status: ", this.savedStatus);
 
-    if (this.savedSearchText != undefined || this.savedStatus != undefined) {
+    if ((this.savedSearchText != undefined || this.savedStatus != undefined) && (this.savedSearchText != '' || this.savedStatus != '')) {
+      console.log("vo 1");
+      
       console.log(this.savedSearchText);
       console.log(this.savedStatus);
-      this.searchProjects2(this.savedSearchText, this.savedStatus);
+      this.searchProjectsAfterNavigated(this.savedSearchText, this.savedStatus);
     } else {
-      console.log("projects count: ", this.projectsCount);
+      console.log("vo 2");
+
+      this.getProjectsCount();
       this.switchPage(this.page);
     }
   }
@@ -85,8 +87,12 @@ export class ListProjectComponent implements OnInit {
     this.sharedService.setPage(page);
     this.page = this.sharedService.getPage();
     console.log("page: ", this.sharedService.getPage());
-    this.loadProjectsPagination(10, (page - 1) * 10);
-    this.setSavedValue('', '');
+    if (this.searchMode == true) {
+      this.searchProjectsAfterNavigated(this.savedSearchText, this.savedStatus);
+    }else{
+      this.loadProjectsPagination(10, (page - 1) * 10);
+      this.setSavedValue('', '');
+    }
   }
 
   public switchPagePrevious(): void {
@@ -96,7 +102,11 @@ export class ListProjectComponent implements OnInit {
     this.sharedService.setPage(this.sharedService.getPage() - 1);
     this.page = this.sharedService.getPage();
     console.log("page: ", this.sharedService.getPage());
-    this.loadProjectsPagination(10, (this.sharedService.getPage() - 1) * 10);
+    if (this.searchMode == true) {
+      this.searchProjectsAfterNavigated(this.savedSearchText, this.savedStatus);
+    }else{
+      this.loadProjectsPagination(10, (this.page - 1) * 10);
+    }
   }
 
   public switchPageNext(): void {
@@ -106,7 +116,11 @@ export class ListProjectComponent implements OnInit {
     this.sharedService.setPage(this.sharedService.getPage() + 1);
     this.page = this.sharedService.getPage();
     console.log("page: ", this.sharedService.getPage());
-    this.loadProjectsPagination(10, (this.sharedService.getPage() - 1) * 10);
+    if (this.searchMode == true) {
+      this.searchProjectsAfterNavigated(this.savedSearchText, this.savedStatus);
+    }else{
+      this.loadProjectsPagination(10, (this.page - 1) * 10);
+    }
   }
 
   public getProjectsCount(): void {
@@ -146,8 +160,6 @@ export class ListProjectComponent implements OnInit {
   public loadProjectsPagination(limit: number, skip: number): void {
     this.projectService.getProjectsPagination(limit, skip).subscribe(
       (response: Project[]) => {
-        console.log("pagi projects: ", response);
-
         this.projects = response;
         this.projects.sort((a, b) => a.projectNumber - b.projectNumber);
       },
@@ -158,19 +170,22 @@ export class ListProjectComponent implements OnInit {
     );
   }
 
-  public searchProjects2(searchText: any, status: any) {
+  public searchProjectsAfterNavigated(searchText: any, status: any) {
+    this.searchMode = true;
+
     if ((searchText == '' && status == '') || (searchText == null && status == null)) {
       this.loadProjectsPagination(10, (this.sharedService.getPage() - 1) * 10);
       return;
     }
 
       this.projectService
-      .searchProjects(searchText ? searchText : '', status ? status : '')
+      .searchProjectsWithPagination(searchText ? searchText : '', status ? status : '', 10, (this.page - 1) * 10)
       .subscribe(
-        (response: Project[]) => {
-          console.log('day la search');
-          console.log(response);
-          this.projects = response;
+        (response: any) => {
+          this.projects = response.results;
+          this.projectsCount = response.totalCount;
+          this.pageQuantity = Math.ceil(this.projectsCount / 10);
+          this.pagesArray = this.generatePageNumbers(this.pageQuantity);
         },
         (error: HttpErrorResponse) => {
           console.log(error);
@@ -185,6 +200,8 @@ export class ListProjectComponent implements OnInit {
   }
 
   public searchProjects(searchForm: NgForm): void {
+    this.searchMode = true;
+
     if ((searchForm.value.searchText == '' && searchForm.value.status == '') || (searchForm.value.searchText == null && searchForm.value.status == null) || (searchForm.value.searchText == undefined && searchForm.value.status == undefined)) {
       this.loadProjectsPagination(10, (this.page - 1) * 10);
       return;
@@ -193,12 +210,13 @@ export class ListProjectComponent implements OnInit {
     this.setSavedValue(searchForm.value.searchText, searchForm.value.status);
 
     this.projectService
-      .searchProjects(searchForm.value.searchText ? searchForm.value.searchText : '', searchForm.value.status ? searchForm.value.status : '')
+      .searchProjectsWithPagination(searchForm.value.searchText ? searchForm.value.searchText : '', searchForm.value.status ? searchForm.value.status : '', 10, (this.page - 1) * 10)
       .subscribe(
-        (response: Project[]) => {
-          console.log('day la search');
-          console.log(response);
-          this.projects = response;
+        (response: any) => {
+          this.projects = response.results;
+          this.projectsCount = response.totalCount;
+          this.pageQuantity = Math.ceil(this.projectsCount / 10);
+          this.pagesArray = this.generatePageNumbers(this.pageQuantity);
         },
         (error: HttpErrorResponse) => {
           console.log(error);
@@ -213,6 +231,8 @@ export class ListProjectComponent implements OnInit {
   }
 
   public resetSearchHandle(searchForm: NgForm) {
+    this.searchMode = false;
+    this.getProjectsCount();
     this.setSavedValue('', '');
     searchForm.form.patchValue({
       searchText: '',
