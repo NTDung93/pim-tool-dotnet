@@ -104,7 +104,7 @@
 
         "numberExist": "The project number already existed. Please select a different project number",
 
-        "membersError": "Selected visas do not exist in the system. Please remove or select different visas",
+        "membersError": "Selected visas do not exist in the system. Please select different visas",
 
         "createProjectFailed": "Create project failed",
 

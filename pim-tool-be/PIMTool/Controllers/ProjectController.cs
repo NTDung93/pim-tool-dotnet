@@ -58,6 +58,28 @@ namespace PIMTool.Controllers
             return Ok(_mapper.Map<IEnumerable<ProjectDto>>(entities));
         }
 
+        //search project by name or status with pagination
+        [HttpGet("search-with-pagination")]
+        public async Task<ActionResult<IEnumerable<ProjectDto>>> SearchWithPagination([FromQuery] string searchText, [FromQuery] int? status, [FromQuery] int limit, [FromQuery] int skip)
+        {
+            var entities = await _projectService.SearchWithPagination(searchText, status, skip, limit);
+            var totalCount = (await _projectService.Search(searchText, status)).Count();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (!entities.Any())
+            {
+                return NotFound();
+            }
+            var searchResultResponse = new SearchResultResponse
+            {
+                results = _mapper.Map<IEnumerable<ProjectDto>>(entities),
+                totalCount = totalCount
+            };
+            return Ok(searchResultResponse);
+        }
+
         [HttpPost]
         public async Task<ActionResult<ProjectDto>> CreateProject([FromBody] ProjectMembersDto projectMembersDto)
         {

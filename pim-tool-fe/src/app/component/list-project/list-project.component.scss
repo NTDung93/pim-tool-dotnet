@@ -105,6 +105,7 @@
     td:first-child {
       width: 0px;
       padding: 0 0.5rem;
+      text-align: center;
     }
 
     th:nth-child(2),
@@ -112,7 +113,7 @@
       width: 80px;
     }
 
-    th:nth-child(2) {
+    th:nth-child(2), th:nth-child(6), td:nth-child(6) {
       text-align: center;
     }
 

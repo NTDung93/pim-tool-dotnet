@@ -3,6 +3,7 @@ using PIMTool.Core.Interfaces.Repositories;
 using PIMTool.Core.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 using PIMTool.Database;
+using PIMTool.Core.Exceptions;
 
 namespace PIMTool.Services
 {
@@ -21,6 +22,12 @@ namespace PIMTool.Services
         {
             try
             {
+                //check duplicate project number
+                var projectWithSameProjectNumber = await _pimContext.Projects.FirstOrDefaultAsync(x => x.ProjectNumber == project.ProjectNumber);
+                if (projectWithSameProjectNumber != null)
+                {
+                    throw new ProjectNumberAlreadyExistsException();
+                }
                 await _repository.AddAsync(project);
                 await _repository.SaveChangesAsync();
                 return project;
@@ -52,7 +59,6 @@ namespace PIMTool.Services
 
         public async Task<IEnumerable<Project>> GetProjects()
         {
-            //var entities = await _repository.Get().ToListAsync();
             var entities = await _pimContext.Projects.Include(x => x.Group.GroupLeader).OrderByDescending(y => y.Id).ToListAsync();
             return entities;
         }
@@ -89,6 +95,38 @@ namespace PIMTool.Services
                       || x.ProjectNumber.ToString().Contains(searchText.Trim().ToLower())).ToListAsync();
             }
             return await _pimContext.Projects.Include(x => x.Group.GroupLeader).Where(x => x.Status == (Core.Domain.Enums.Status)status).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Project>> SearchWithPagination(string searchText, int? status, int skip, int limit)
+        {
+            IEnumerable<Project> searchResult;
+            if (!string.IsNullOrEmpty(searchText) && status.HasValue)
+            {
+                searchResult = await _pimContext.Projects.Include(x => x.Group.GroupLeader)
+                    .Where(x =>
+                        (
+                            x.Name.ToLower().Contains(searchText.Trim().ToLower())
+                            || x.Customer.ToLower().Contains(searchText.Trim().ToLower())
+                            || x.ProjectNumber.ToString().Contains(searchText.Trim().ToLower())
+                        )
+                        && x.Status == (Core.Domain.Enums.Status)status).ToListAsync();
+            }
+            else if (!string.IsNullOrEmpty(searchText) && !status.HasValue)
+            {
+                searchResult = await _pimContext.Projects.Include(x => x.Group.GroupLeader)
+                  .Where(x => x.Name.ToLower().Contains(searchText.Trim().ToLower())
+                      || x.Customer.ToLower().Contains(searchText.Trim().ToLower())
+                      || x.ProjectNumber.ToString().Contains(searchText.Trim().ToLower())).ToListAsync();
+            }
+            else
+            {
+                searchResult = await _pimContext.Projects.Include(x => x.Group.GroupLeader).Where(x => x.Status == (Core.Domain.Enums.Status)status).ToListAsync();
+            }
+            var entities = searchResult
+                            .OrderBy(y => y.ProjectNumber)
+                            .Skip(skip)
+                            .Take(limit);
+            return entities;
         }
 
         public async Task UpdateAsync()

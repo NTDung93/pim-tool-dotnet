@@ -93,12 +93,11 @@ export class ProjectDetailComponent {
   search($event: any) {
     this.employeeService.searchEmployees($event.query).subscribe(
       (response) => {
-        this.empList = response
+        this.empList = response,
+        this.membersError = ''
       },
       (error: HttpErrorResponse) => {
         this.empList = []
-        console.log("error search for members: ", error);
-        this.navigateToErrorPage();
       }
     )
   }
