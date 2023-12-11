@@ -616,5 +616,73 @@ namespace PIMTool.Test.Services
             // Assert
             Assert.That(entity.Count(), Is.EqualTo(1));
         }
+
+        //test count service
+        [Test]
+        public async Task TestCountProject()
+        {
+            // Arrange
+            var projects = new List<Project>()
+            {
+                    new Project
+                    {
+                        ProjectNumber = 101,
+                        Name = "Test Project 1",
+                        Customer = "Test Customer 1",
+                        Status = Status.NEW,
+                        StartDate = DateTime.Now,
+                        EndDate = DateTime.Now.AddDays(10),
+                        GroupId = 1
+                    },
+                    new Project
+                    {
+                        ProjectNumber = 102,
+                        Name = "Test Project 2",
+                        Customer = "Test Customer 2",
+                        Status = Status.PLA,
+                        StartDate = DateTime.Now,
+                        EndDate = DateTime.Now.AddDays(10),
+                        GroupId = 2
+                    },
+                    new Project
+                    {
+                        ProjectNumber = 103,
+                        Name = "Test Project 3",
+                        Customer = "Test Customer 3",
+                        Status = Status.FIN,
+                        StartDate = DateTime.Now,
+                        EndDate = DateTime.Now.AddDays(10),
+                        GroupId = 3
+                    },
+                    new Project
+                    {
+                        ProjectNumber = 104,
+                        Name = "Test Project 4",
+                        Customer = "Test Customer 4",
+                        Status = Status.NEW,
+                        StartDate = DateTime.Now,
+                        EndDate = DateTime.Now.AddDays(10),
+                        GroupId = 4
+                    },
+                    new Project
+                    {
+                        ProjectNumber = 105,
+                        Name = "Test Project 5",
+                        Customer = "Test Customer 5",
+                        Status = Status.INP,
+                        StartDate = DateTime.Now,
+                        EndDate = DateTime.Now.AddDays(10),
+                        GroupId = 1
+                    }
+            };
+            await Context.Projects.AddRangeAsync(projects);
+            await Context.SaveChangesAsync();
+        
+            // Act
+            var entities = await _projectService.GetProjectsCount();
+
+            // Assert
+            Assert.That(entities, Is.EqualTo(5));
+        }
     }
 }

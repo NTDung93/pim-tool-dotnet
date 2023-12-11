@@ -17,11 +17,11 @@ export class StatusPipe implements PipeTransform {
       case 'INP':
         return 'In Progress';
       case 'PLA':
-        return 'Planning';
+        return 'Planned';
       case 'NEW':
         return 'New';
       case 'FIN':
-        return 'Finish';
+        return 'Finished';
       default:
         return 'Unknown';
     }
@@ -71,14 +71,10 @@ export class ListProjectComponent implements OnInit {
     console.log("saved status: ", this.savedStatus);
 
     if ((this.savedSearchText != undefined || this.savedStatus != undefined) && (this.savedSearchText != '' || this.savedStatus != '')) {
-      console.log("vo 1");
-
       console.log(this.savedSearchText);
       console.log(this.savedStatus);
       this.searchProjectsAfterNavigated(this.savedSearchText, this.savedStatus);
     } else {
-      console.log("vo 2");
-
       this.getProjectsCount();
       this.switchPage(this.page);
     }
@@ -143,26 +139,10 @@ export class ListProjectComponent implements OnInit {
     return Array.from({ length: pageQuantity }, (_, index) => index + 1);
   }
 
-  public getProjects(): void {
-    this.projectService.getProjects().subscribe(
-      (response: Project[]) => {
-        console.log(response);
-
-        this.projects = response;
-        this.projects.sort((a, b) => a.projectNumber - b.projectNumber);
-      },
-      (error: HttpErrorResponse) => {
-        console.log("error get projects: ", error);
-        this.navigateToErrorPage();
-      }
-    );
-  }
-
   public loadProjectsPagination(skip: number): void {
     this.projectService.getProjectsPagination(this.limit, skip).subscribe(
       (response: Project[]) => {
         this.projects = response;
-        this.projects.sort((a, b) => a.projectNumber - b.projectNumber);
       },
       (error: HttpErrorResponse) => {
         console.log("error get projects pagination: ", error);
@@ -214,8 +194,12 @@ export class ListProjectComponent implements OnInit {
       .searchProjectsWithPagination(searchForm.value.searchText ? searchForm.value.searchText : '', searchForm.value.status ? searchForm.value.status : '', this.limit, (this.page - 1) * this.limit)
       .subscribe(
         (response: any) => {
-          this.projects = response.results;
           this.projectsCount = response.totalCount;
+          if (this.projectsCount == 0) {
+            this._toastService.info('Project not found');
+            return;
+          }
+          this.projects = response.results;
           this.pageQuantity = Math.ceil(this.projectsCount / this.limit);
           this.pagesArray = this.generatePageNumbers(this.pageQuantity);
         },
@@ -252,7 +236,6 @@ export class ListProjectComponent implements OnInit {
     this.projectService.deleteProject(projectId).subscribe(
       (response: void) => {
         console.log(response);
-        this.getProjectsCount();
         this.switchPage(this.page);
       },
       (error: HttpErrorResponse) => {
@@ -293,6 +276,7 @@ export class ListProjectComponent implements OnInit {
   }
 
   toggleSelection(project: Project) {
+    //if the project is already in the array, remove it, else add it
     if (this.isSelected(project)) {
       this.selectedItems = this.selectedItems.filter(
         (item) => item.id !== project.id
@@ -304,6 +288,7 @@ export class ListProjectComponent implements OnInit {
   }
 
   isSelected(project: Project) {
+    //check whether the passed project is selected, some() function will return true if the project is already in the array
     return this.selectedItems.some((item) => item.id === project.id);
   }
 

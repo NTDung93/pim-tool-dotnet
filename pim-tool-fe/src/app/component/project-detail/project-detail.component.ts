@@ -12,7 +12,6 @@ import { PrimeNGConfig } from 'primeng/api';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { EmployeeService } from 'src/app/service/employee.service';
 import { ProjectMembers } from '../../model/project';
-import { formatDate } from '@angular/common';
 import { Employee } from '../../model/employee';
 import * as moment from 'moment';
 
@@ -106,8 +105,6 @@ export class ProjectDetailComponent {
   }
 
   selectEmpId(value: any) {
-    console.log("select value: ", value);
-
     if (!this.selectedEmployee.includes(value.id)) {
       this.selectedEmployee.push(value.id);
     }
@@ -154,12 +151,6 @@ export class ProjectDetailComponent {
         console.log("test proj: ", this.updateProject);
         console.log("test mem: ", this.selectedEmployee);
         console.log("version: ", this.updateProject.version);
-        console.log("start dateeeeeeeeeeee", moment(this.updateProject.startDate).format('DD.MM.YYYY'));
-        this.startDate = moment(this.updateProject.startDate).format('DD.MM.YYYY');
-        console.log("start date: ", this.startDate);
-        if (this.updateProject.endDate){
-          this.endDate = moment(this.updateProject.endDate).format('DD.MM.YYYY');
-        }
 
         // find the members from the empList that has the correct id from listEmpId and add to the selectedItem
         response.listEmpId.forEach((e: number) => {
@@ -247,10 +238,6 @@ export class ProjectDetailComponent {
         this.router.navigateByUrl('/list');
       },
       (error: HttpErrorResponse) => {
-        console.log(error);
-        console.log(error.error.detail);
-        console.log("status text", error.statusText);
-
         if (error.error.detail.includes('project number already existed')) {
           this.numberErr = 'projectDetail.numberExist';
           this.isFailed = true;
@@ -322,10 +309,6 @@ export class ProjectDetailComponent {
         addForm.reset();
       },
       (error: HttpErrorResponse) => {
-        console.log(error);
-        console.log(error.error.detail);
-        console.log("status text", error.statusText);
-
         this.isFailed = true;
         if (error.error.detail.includes('The project has been updated by another user')) {
           this.globalErr = 'projectDetail.concurrentUpdate';
@@ -348,12 +331,6 @@ export class ProjectDetailComponent {
 
   navigateToErrorPage() {
     this.router.navigate(['/error']);
-  }
-
-  formatDate(date: any): any {
-    date = date + '';
-    var myDate = moment(date).format('DD.MM.YYYY');
-    return myDate;
   }
 
   refreshPage() {

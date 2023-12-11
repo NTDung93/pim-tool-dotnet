@@ -102,7 +102,7 @@
 
         "numberExist": "Le numéro de projet existait déjà. Sélectionner un autre numéro de projet",
 
-        "membersError": "Les visas sélectionnés n'existent pas dans le système. Veuillez sélectionner différents visas",
+        "membersError": "Les visas sélectionnés n'existent pas. Veuillez sélectionner différents visas",
 
         "createProjectFailed": "La création du projet a échoué",
 

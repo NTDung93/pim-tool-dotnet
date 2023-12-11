@@ -89,8 +89,14 @@ namespace PIMTool.Controllers
             // start date must be less than end date --> checked
             // handle unexpected error
 
-            var listProjects = await _projectService.GetProjects();
-            if (listProjects.Any(p => p.ProjectNumber == projectMembersDto.ProjectDto.ProjectNumber))
+            //var listProjects = await _projectService.GetProjects();
+            //if (listProjects.Any(p => p.ProjectNumber == projectMembersDto.ProjectDto.ProjectNumber))
+            //{
+            //    throw new ProjectNumberAlreadyExistsException();
+            //}
+
+            var existedProject = await _projectService.GetByProjectNumber(projectMembersDto.ProjectDto.ProjectNumber);
+            if (existedProject != null)
             {
                 throw new ProjectNumberAlreadyExistsException();
             }
@@ -137,7 +143,7 @@ namespace PIMTool.Controllers
 
             if (currentProject == null)
             {
-                  throw new ProjectNotFound();
+                throw new ProjectNotFound();
             }
 
 
@@ -163,19 +169,19 @@ namespace PIMTool.Controllers
                 {
                     await _projectService.UpdateAsync();
 
-                    if (projMember.ListEmpId.Length > 0)
+                    //delete all project employee of this project
+                    var listProjectEmp = await _projectEmployeeService.GetProjectEmployees();
+                    foreach (var projectEmp in listProjectEmp)
                     {
-                        //delete all project employee of this project
-                        var listProjectEmp = await _projectEmployeeService.GetProjectEmployees();
-                        foreach (var projectEmp in listProjectEmp)
+                        if (projectEmp.ProjectId == id)
                         {
-                            if (projectEmp.ProjectId == id)
-                            {
-                                await _projectEmployeeService.DeleteAsync(projectEmp);
-                            }
+                            await _projectEmployeeService.DeleteAsync(projectEmp);
                         }
+                    }
 
-                        //add all again
+                    //add all again
+                    if (projMember.ListEmpId.Any())
+                    {
                         foreach (var empId in projMember.ListEmpId)
                         {
                             var projectEmp = new ProjectEmployee
@@ -185,7 +191,6 @@ namespace PIMTool.Controllers
                             };
                             await _projectEmployeeService.AddAsync(projectEmp);
                         }
-
                     }
 
                     //get the project and list member id of its after update
