@@ -17,11 +17,11 @@ export class StatusPipe implements PipeTransform {
       case 'INP':
         return 'In Progress';
       case 'PLA':
-        return 'Planning';
+        return 'Planned';
       case 'NEW':
         return 'New';
       case 'FIN':
-        return 'Finish';
+        return 'Finished';
       default:
         return 'Unknown';
     }
@@ -46,6 +46,7 @@ export class ListProjectComponent implements OnInit {
   pageQuantity: number = 0;
   pagesArray: number[] = [];
   searchMode: boolean = false;
+  limit: number = 5;
 
   constructor(
     private projectService: ProjectService,
@@ -57,27 +58,23 @@ export class ListProjectComponent implements OnInit {
   ngOnInit(): void {
     this.savedSearchText = this.sharedService.getSavedSearchText();
     this.savedStatus = this.sharedService.getSavedSatus();
-    
+
     if (this.sharedService.getPage() == undefined) {
       this.page = 1;
       this.sharedService.setPage(1);
-    }else{
+    } else {
       this.page = this.sharedService.getPage();
     }
-    
+
     console.log("current page: ", this.sharedService.getPage());
     console.log("saved search text: ", this.savedSearchText);
     console.log("saved status: ", this.savedStatus);
 
     if ((this.savedSearchText != undefined || this.savedStatus != undefined) && (this.savedSearchText != '' || this.savedStatus != '')) {
-      console.log("vo 1");
-      
       console.log(this.savedSearchText);
       console.log(this.savedStatus);
       this.searchProjectsAfterNavigated(this.savedSearchText, this.savedStatus);
     } else {
-      console.log("vo 2");
-
       this.getProjectsCount();
       this.switchPage(this.page);
     }
@@ -89,8 +86,8 @@ export class ListProjectComponent implements OnInit {
     console.log("page: ", this.sharedService.getPage());
     if (this.searchMode == true) {
       this.searchProjectsAfterNavigated(this.savedSearchText, this.savedStatus);
-    }else{
-      this.loadProjectsPagination(10, (page - 1) * 10);
+    } else {
+      this.loadProjectsPagination((page - 1) * this.limit);
       this.setSavedValue('', '');
     }
   }
@@ -104,8 +101,8 @@ export class ListProjectComponent implements OnInit {
     console.log("page: ", this.sharedService.getPage());
     if (this.searchMode == true) {
       this.searchProjectsAfterNavigated(this.savedSearchText, this.savedStatus);
-    }else{
-      this.loadProjectsPagination(10, (this.page - 1) * 10);
+    } else {
+      this.loadProjectsPagination((this.page - 1) * this.limit);
     }
   }
 
@@ -118,8 +115,8 @@ export class ListProjectComponent implements OnInit {
     console.log("page: ", this.sharedService.getPage());
     if (this.searchMode == true) {
       this.searchProjectsAfterNavigated(this.savedSearchText, this.savedStatus);
-    }else{
-      this.loadProjectsPagination(10, (this.page - 1) * 10);
+    } else {
+      this.loadProjectsPagination((this.page - 1) * this.limit);
     }
   }
 
@@ -128,7 +125,7 @@ export class ListProjectComponent implements OnInit {
       (response: number) => {
         console.log("count: ", response);
         this.projectsCount = response;
-        this.pageQuantity = Math.ceil(this.projectsCount / 10);
+        this.pageQuantity = Math.ceil(this.projectsCount / this.limit);
         this.pagesArray = this.generatePageNumbers(this.pageQuantity);
       },
       (error: HttpErrorResponse) => {
@@ -142,26 +139,10 @@ export class ListProjectComponent implements OnInit {
     return Array.from({ length: pageQuantity }, (_, index) => index + 1);
   }
 
-  public getProjects(): void {
-    this.projectService.getProjects().subscribe(
-      (response: Project[]) => {
-        console.log(response);
-
-        this.projects = response;
-        this.projects.sort((a, b) => a.projectNumber - b.projectNumber);
-      },
-      (error: HttpErrorResponse) => {
-        console.log("error get projects: ", error);
-        this.navigateToErrorPage();
-      }
-    );
-  }
-
-  public loadProjectsPagination(limit: number, skip: number): void {
-    this.projectService.getProjectsPagination(limit, skip).subscribe(
+  public loadProjectsPagination(skip: number): void {
+    this.projectService.getProjectsPagination(this.limit, skip).subscribe(
       (response: Project[]) => {
         this.projects = response;
-        this.projects.sort((a, b) => a.projectNumber - b.projectNumber);
       },
       (error: HttpErrorResponse) => {
         console.log("error get projects pagination: ", error);
@@ -174,17 +155,17 @@ export class ListProjectComponent implements OnInit {
     this.searchMode = true;
 
     if ((searchText == '' && status == '') || (searchText == null && status == null)) {
-      this.loadProjectsPagination(10, (this.sharedService.getPage() - 1) * 10);
+      this.loadProjectsPagination((this.sharedService.getPage() - 1) * this.limit);
       return;
     }
 
-      this.projectService
-      .searchProjectsWithPagination(searchText ? searchText : '', status ? status : '', 10, (this.page - 1) * 10)
+    this.projectService
+      .searchProjectsWithPagination(searchText ? searchText : '', status ? status : '', this.limit, (this.page - 1) * this.limit)
       .subscribe(
         (response: any) => {
           this.projects = response.results;
           this.projectsCount = response.totalCount;
-          this.pageQuantity = Math.ceil(this.projectsCount / 10);
+          this.pageQuantity = Math.ceil(this.projectsCount / this.limit);
           this.pagesArray = this.generatePageNumbers(this.pageQuantity);
         },
         (error: HttpErrorResponse) => {
@@ -203,19 +184,23 @@ export class ListProjectComponent implements OnInit {
     this.searchMode = true;
 
     if ((searchForm.value.searchText == '' && searchForm.value.status == '') || (searchForm.value.searchText == null && searchForm.value.status == null) || (searchForm.value.searchText == undefined && searchForm.value.status == undefined)) {
-      this.loadProjectsPagination(10, (this.page - 1) * 10);
+      this.loadProjectsPagination((this.page - 1) * this.limit);
       return;
     }
 
     this.setSavedValue(searchForm.value.searchText, searchForm.value.status);
 
     this.projectService
-      .searchProjectsWithPagination(searchForm.value.searchText ? searchForm.value.searchText : '', searchForm.value.status ? searchForm.value.status : '', 10, (this.page - 1) * 10)
+      .searchProjectsWithPagination(searchForm.value.searchText ? searchForm.value.searchText : '', searchForm.value.status ? searchForm.value.status : '', this.limit, (this.page - 1) * this.limit)
       .subscribe(
         (response: any) => {
-          this.projects = response.results;
           this.projectsCount = response.totalCount;
-          this.pageQuantity = Math.ceil(this.projectsCount / 10);
+          if (this.projectsCount == 0) {
+            this._toastService.info('Project not found');
+            return;
+          }
+          this.projects = response.results;
+          this.pageQuantity = Math.ceil(this.projectsCount / this.limit);
           this.pagesArray = this.generatePageNumbers(this.pageQuantity);
         },
         (error: HttpErrorResponse) => {
@@ -240,7 +225,7 @@ export class ListProjectComponent implements OnInit {
     });
     this.page = 1;
     this.sharedService.setPage(1);
-    this.loadProjectsPagination(10, 0);
+    this.loadProjectsPagination(0);
   }
 
   public setProjectIdDelete(projectId: number) {
@@ -251,12 +236,16 @@ export class ListProjectComponent implements OnInit {
     this.projectService.deleteProject(projectId).subscribe(
       (response: void) => {
         console.log(response);
-        this.getProjectsCount();
         this.switchPage(this.page);
       },
       (error: HttpErrorResponse) => {
-        console.log("error delete single projects: ", error);
-        this.navigateToErrorPage();
+        if (error.error.detail.includes("The project has been deleted by another user")) {
+          this._toastService.info('The project has been deleted by another user. Please refresh the page');
+          return;
+        }else{
+          console.log("error delete single projects: ", error);
+          this.navigateToErrorPage();
+        }
       }
     );
 
@@ -269,7 +258,11 @@ export class ListProjectComponent implements OnInit {
         (response: void) => {
           console.log(response);
           this.getProjectsCount();
-          this.loadProjectsPagination(10, 0);
+          if ((this.savedSearchText != undefined || this.savedStatus != undefined) && (this.savedSearchText != '' || this.savedStatus != '')) {
+            this.page = 1;
+            this.sharedService.setPage(1);
+          }
+          this.switchPage(this.page);
         },
         (error: HttpErrorResponse) => {
           console.log(project.id);
@@ -283,6 +276,7 @@ export class ListProjectComponent implements OnInit {
   }
 
   toggleSelection(project: Project) {
+    //if the project is already in the array, remove it, else add it
     if (this.isSelected(project)) {
       this.selectedItems = this.selectedItems.filter(
         (item) => item.id !== project.id
@@ -294,6 +288,7 @@ export class ListProjectComponent implements OnInit {
   }
 
   isSelected(project: Project) {
+    //check whether the passed project is selected, some() function will return true if the project is already in the array
     return this.selectedItems.some((item) => item.id === project.id);
   }
 

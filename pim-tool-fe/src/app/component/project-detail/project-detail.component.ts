@@ -12,8 +12,8 @@ import { PrimeNGConfig } from 'primeng/api';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { EmployeeService } from 'src/app/service/employee.service';
 import { ProjectMembers } from '../../model/project';
-import { formatDate } from '@angular/common';
 import { Employee } from '../../model/employee';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-project-detail',
@@ -46,6 +46,8 @@ export class ProjectDetailComponent {
   formGroup: FormGroup | undefined;
   selectedEmployee: number[] = [];
   hasEmp: boolean = false;
+  startDate: any;
+  endDate: any;
 
   constructor(
     private projectService: ProjectService,
@@ -103,8 +105,6 @@ export class ProjectDetailComponent {
   }
 
   selectEmpId(value: any) {
-    console.log("select value: ", value);
-
     if (!this.selectedEmployee.includes(value.id)) {
       this.selectedEmployee.push(value.id);
     }
@@ -238,10 +238,6 @@ export class ProjectDetailComponent {
         this.router.navigateByUrl('/list');
       },
       (error: HttpErrorResponse) => {
-        console.log(error);
-        console.log(error.error.detail);
-        console.log("status text", error.statusText);
-
         if (error.error.detail.includes('project number already existed')) {
           this.numberErr = 'projectDetail.numberExist';
           this.isFailed = true;
@@ -313,10 +309,6 @@ export class ProjectDetailComponent {
         addForm.reset();
       },
       (error: HttpErrorResponse) => {
-        console.log(error);
-        console.log(error.error.detail);
-        console.log("status text", error.statusText);
-
         this.isFailed = true;
         if (error.error.detail.includes('The project has been updated by another user')) {
           this.globalErr = 'projectDetail.concurrentUpdate';
@@ -339,5 +331,9 @@ export class ProjectDetailComponent {
 
   navigateToErrorPage() {
     this.router.navigate(['/error']);
+  }
+
+  refreshPage() {
+    location.reload();
   }
 }
